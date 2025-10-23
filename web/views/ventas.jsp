@@ -28,7 +28,7 @@
         </div>
         <div class="card-body">
 
-            <form action="../sr_venta" method="post">
+            <form id="ventaForm" action="${pageContext.request.contextPath}/sr_venta" method="post">
 
                 <!-- DATOS DEL CLIENTE -->
                 <h5 class="text-secondary">Datos del cliente</h5>
@@ -111,23 +111,23 @@
                     <tbody id="detalle">
                         <tr>
                             <td>
-                                <select name="id_producto" class="form-select producto">
+                                <select name="id_producto[]" class="form-select producto">
                                     <%
                                         cn = new ConexionDB();
                                         con = cn.getConexion();
-                                        ps = con.prepareStatement("SELECT id_producto, producto, precio_costo FROM productos");
+                                        ps = con.prepareStatement("SELECT id_producto, producto, precio_venta FROM productos");
                                         rs = ps.executeQuery();
                                         while (rs.next()) {
                                     %>
-                                        <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_costo")%>">
+                                        <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_venta")%>">
                                             <%=rs.getString("producto")%>
                                         </option>
                                     <% } con.close(); %>
                                 </select>
                             </td>
-                            <td><input type="number" name="cantidad" class="form-control cantidad" value="1" min="1"></td>
-                            <td><input type="text" name="precio" class="form-control precio" readonly></td>
-                            <td><input type="text" name="subtotal" class="form-control subtotal" readonly></td>
+                            <td><input type="number" name="cantidad[]" class="form-control cantidad" value="1" min="1"></td>
+                            <td><input type="text" name="precio[]" class="form-control precio" readonly></td>
+                            <td><input type="text" name="subtotal[]" class="form-control subtotal" readonly></td>
                             <td class="text-center"><button type="button" class="btn btn-danger btn-sm eliminar">🗑️</button></td>
                         </tr>
                     </tbody>
@@ -153,6 +153,62 @@
 
 <!-- ========== JAVASCRIPT ========== -->
 <script>
+    // Función para recalcular subtotal y total
+    function recalcular() {
+        let total = 0;
+        $("#tablaProductos tbody tr").each(function() {
+            let cantidad = parseInt($(this).find(".cantidad").val()) || 0;
+            let precio = parseFloat($(this).find(".precio").val()) || 0;
+            let subtotal = cantidad * precio;
+            $(this).find(".subtotal").val(subtotal.toFixed(2));
+            total += subtotal;
+        });
+        $("#total").val(total.toFixed(2));
+    }
+
+    // Actualizar precio cuando se selecciona un producto
+    $(document).on('change', '.producto', function() {
+        let precioBase = $(this).find(':selected').data('precio');
+        $(this).closest('tr').find('.precio').val(precioBase);
+        recalcular();
+    });
+
+    // Recalcular cuando cambia la cantidad
+    $(document).on('input', '.cantidad', function() {
+        recalcular();
+    });
+
+    // Eliminar fila
+    $(document).on('click', '.eliminar', function() {
+        if($("#tablaProductos tbody tr").length > 1) {
+            $(this).closest('tr').remove();
+        } else {
+            $(this).closest('tr').find('input').val('');
+            $(this).closest('tr').find('select').prop('selectedIndex', 0);
+        }
+        recalcular();
+    });
+
+    // Agregar nueva fila
+    $("#agregar").click(function() {
+        let newRow = $("#tablaProductos tbody tr:first").clone();
+        newRow.find('input').val('');
+        newRow.find('select').prop('selectedIndex', 0);
+        newRow.find('.cantidad').val('1');
+        $("#tablaProductos tbody").append(newRow);
+        recalcular();
+    });
+
+    // Trigger inicial para establecer precios
+    $('.producto').trigger('change');
+
+    $('#ventaForm').on('submit', function(e) {
+        // Los campos ya tienen los nombres correctos con []
+        return true;
+        
+        return false;
+    });
+
     // Calcular subtotales y total
     function calcularTotales() {
         let total = 0;

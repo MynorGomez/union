@@ -37,7 +37,7 @@ public class CompraDetalle {
     public void setPrecio_unitario(double p) { this.precio_unitario = p; }
 
     public boolean agregar() {
-        String query = "INSERT INTO Compras_detalle (id_compra, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO compras_detalle (id_compra, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
         try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id_compra);
             ps.setInt(2, id_producto);
@@ -53,7 +53,7 @@ public class CompraDetalle {
 
     public List<CompraDetalle> leerPorCompra(int idCompra) {
         List<CompraDetalle> lista = new ArrayList<>();
-        String query = "SELECT * FROM Compras_detalle WHERE id_compra=?";
+        String query = "SELECT * FROM compras_detalle WHERE id_compra=?";
         try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, idCompra);
             ResultSet rs = ps.executeQuery();

@@ -49,7 +49,7 @@ public class Compra {
     // CRUD
     // ======================================================
     public boolean agregar() {
-        String query = "INSERT INTO Compras (negorden_compra, id_proveedor, fecha_gridem, fecha_ingreso) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO compras (negorden_compra, id_proveedor, fecha_gridem, fecha_ingreso) VALUES (?, ?, ?, ?)";
         try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, negorden_compra);
             ps.setInt(2, id_proveedor);
@@ -65,12 +65,12 @@ public class Compra {
 
     public List<Compra> leer() {
         List<Compra> lista = new ArrayList<>();
-        String query = """
-            SELECT c.id_compra, c.negorden_compra, c.id_proveedor,
-                   c.fecha_gridem, c.fecha_ingreso, p.proveedor
-            FROM Compras c
-            INNER JOIN Proveedores p ON c.id_proveedor = p.id_proveedor;
-        """;
+        
+        String query = "SELECT c.id_compra, c.negorden_compra, c.id_proveedor, " +
+                      "c.fecha_gridem, c.fecha_ingreso, p.proveedor " +
+                      "FROM compras c " +
+                      "INNER JOIN proveedores p ON c.id_proveedor = p.id_proveedor";
+                      
         try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

@@ -55,7 +55,7 @@ public class sr_compra extends HttpServlet {
 
     private int obtenerUltimoIdCompra() {
         try (var con = new utils.ConexionDB().getConexion();
-             var ps = con.prepareStatement("SELECT MAX(id_compra) FROM Compras");
+             var ps = con.prepareStatement("SELECT MAX(id_compra) FROM compras");
              var rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {

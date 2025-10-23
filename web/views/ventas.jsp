@@ -1,3 +1,5 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, modelo.*, utils.ConexionDB, java.sql.*" %>
 <!DOCTYPE html>
@@ -250,6 +252,6 @@ function mostrarMensaje(texto, tipo) {
 }
 
 </script>
-
+</div>
 </body>
 </html>

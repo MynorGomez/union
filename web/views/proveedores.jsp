@@ -1,3 +1,5 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
 <%@ page import="modelo.Proveedor,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -78,6 +80,6 @@ function seleccionarProveedor(fila) {
     document.getElementById("btnEliminar").classList.remove("d-none");
 }
 </script>
-
+</div>
 </body>
 </html>

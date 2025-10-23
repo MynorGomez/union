@@ -1,3 +1,5 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
 <%@ page import="modelo.Compra,modelo.Proveedor,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -160,5 +162,6 @@ function eliminarFila(btn) {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 </body>
 </html>

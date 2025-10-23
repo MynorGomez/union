@@ -1,3 +1,7 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
+
+
 <%@ page import="modelo.Cliente,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -10,7 +14,7 @@
 </head>
 <body class="bg-light">
 <div class="container mt-5">
-    <h2 class="mb-4 text-center text-primary">Mantenimiento de Clientes</h2>
+    <h2 class="mb-4 text-center text-primary">Clientes</h2>
 
     <!-- Formulario -->
     <form action="../sr_cliente" method="post" class="card p-4 shadow-sm">
@@ -84,5 +88,7 @@ function seleccionarCliente(fila) {
     document.getElementById("btnEliminar").classList.remove("d-none");
 }
 </script>
+</div>
+
 </body>
 </html>

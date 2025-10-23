@@ -1,3 +1,5 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
 <%@ page import="modelo.Puesto,modelo.Empleado,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -111,6 +113,6 @@ function seleccionarEmpleado(fila) {
     document.getElementById("btnEliminar").classList.remove("d-none");
 }
 </script>
-
+</div>
 </body>
 </html>

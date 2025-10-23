@@ -1,3 +1,6 @@
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
+
 <%@ page import="modelo.Puesto" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -61,6 +64,6 @@
         </div>
     </div>
 </div>
-
+</div>
 </body>
 </html>

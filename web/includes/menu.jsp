@@ -74,7 +74,7 @@
     String context = request.getContextPath(); // Ej: /Sistema
 %>
 
-    <a href="<%= context %>/views/index.jsp" class="<%= currentPage.contains("index.jsp") ? "active" : "" %>">
+    <a href="<%= context %>/index.jsp" class="<%= currentPage.contains("index.jsp") ? "active" : "" %>">
         <i class="bi bi-house-door"></i> Inicio
     </a>
 

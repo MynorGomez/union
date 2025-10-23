@@ -1,24 +1,39 @@
-<%@ include file="../includes/menu.jsp" %>
-<div class="main-content">
 <%@ page import="modelo.Puesto,modelo.Empleado,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Mantenimiento de Empleados</title>
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         tr:hover { background-color: #e8f4ff; cursor: pointer; }
+        #formEmpleados { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-light">
-
-<div class="container mt-5">
+<%@ include file="../includes/menu.jsp" %>
+<div class="main-content">
+    <div class="container-fluid">
     <h2 class="mb-4 text-center text-primary">Mantenimiento de Empleados</h2>
 
+    <!-- 🔘 BOTÓN PARA MOSTRAR/OCULTAR FORMULARIO -->
+    <div class="text-end mb-3">
+        <button id="btnMostrarForm" class="btn btn-success">
+            ➕ Nuevo Empleado
+        </button>
+    </div>
+
     <!-- FORMULARIO -->
-    <form action="../sr_empleado" method="post" class="card p-4 shadow-sm">
+    <form action="../sr_empleado" method="post" class="card p-4 shadow-sm d-none" id="formEmpleados">
         <input type="hidden" name="id_empleado" id="id_empleado">
 
         <div class="row g-3">
@@ -111,7 +126,20 @@ function seleccionarEmpleado(fila) {
     document.getElementById("btnAccion").textContent = "Actualizar";
     document.getElementById("btnAccion").classList.replace("btn-success", "btn-warning");
     document.getElementById("btnEliminar").classList.remove("d-none");
+    
+    // Mostrar el formulario si está oculto
+    $("#formEmpleados").removeClass("d-none");
+    $("#btnMostrarForm").text("❌ Ocultar formulario");
 }
+
+// Mostrar / ocultar formulario
+$(document).ready(function(){
+    $("#btnMostrarForm").on("click", function(e){
+        e.preventDefault();
+        $("#formEmpleados").toggleClass("d-none");
+        $(this).text($("#formEmpleados").hasClass("d-none") ? "➕ Nuevo Empleado" : "❌ Ocultar formulario");
+    });
+});
 </script>
 </div>
 </body>

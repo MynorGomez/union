@@ -8,15 +8,26 @@
     <meta charset="UTF-8">
     <title>Mantenimiento de Proveedores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style> tr:hover { background-color: #e8f4ff; cursor: pointer; } </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style> 
+        tr:hover { background-color: #e8f4ff; cursor: pointer; }
+        #formProveedores { transition: all 0.3s ease; }
+    </style>
 </head>
 <body class="bg-light">
 
 <div class="container mt-5">
     <h2 class="mb-4 text-center text-primary">Mantenimiento de Proveedores</h2>
 
+    <!-- 🔘 BOTÓN PARA MOSTRAR/OCULTAR FORMULARIO -->
+    <div class="text-end mb-3">
+        <button id="btnMostrarForm" class="btn btn-success">
+            ➕ Nuevo Proveedor
+        </button>
+    </div>
+
     <!-- Formulario -->
-    <form action="../sr_proveedor" method="post" class="card p-4 shadow-sm">
+    <form action="../sr_proveedor" method="post" class="card p-4 shadow-sm d-none" id="formProveedores">
         <input type="hidden" name="id_proveedor" id="id_proveedor">
 
         <div class="row g-3">
@@ -78,7 +89,20 @@ function seleccionarProveedor(fila) {
     document.getElementById("btnAccion").textContent = "Actualizar";
     document.getElementById("btnAccion").classList.replace("btn-success", "btn-warning");
     document.getElementById("btnEliminar").classList.remove("d-none");
+    
+    // Mostrar el formulario si está oculto
+    $("#formProveedores").removeClass("d-none");
+    $("#btnMostrarForm").text("❌ Ocultar formulario");
 }
+
+// Mostrar / ocultar formulario
+$(document).ready(function(){
+    $("#btnMostrarForm").on("click", function(e){
+        e.preventDefault();
+        $("#formProveedores").toggleClass("d-none");
+        $(this).text($("#formProveedores").hasClass("d-none") ? "➕ Nuevo Proveedor" : "❌ Ocultar formulario");
+    });
+});
 </script>
 </div>
 </body>

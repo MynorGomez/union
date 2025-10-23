@@ -10,14 +10,26 @@
     <meta charset="UTF-8">
     <title>Mantenimiento de Puestos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        tr:hover { background-color: #e8f4ff; cursor: pointer; }
+        #formPuestos { transition: all 0.3s ease; }
+    </style>
 </head>
 <body class="bg-light">
 
 <div class="container mt-5">
     <h2 class="mb-4 text-center text-primary">Mantenimiento de Puestos</h2>
 
+    <!-- 🔘 BOTÓN PARA MOSTRAR/OCULTAR FORMULARIO -->
+    <div class="text-end mb-3">
+        <button id="btnMostrarForm" class="btn btn-success">
+            ➕ Nuevo Puesto
+        </button>
+    </div>
+
     <!-- Formulario -->
-    <form action="../sr_puesto" method="post" class="card p-4 shadow-sm">
+    <form action="../sr_puesto" method="post" class="card p-4 shadow-sm d-none" id="formPuestos">
         <div class="row g-3 align-items-center">
             <div class="col-md-4">
                 <label for="txt_puesto" class="form-label">Nombre del Puesto</label>
@@ -64,6 +76,18 @@
         </div>
     </div>
 </div>
+
+<!-- JS -->
+<script>
+$(document).ready(function(){
+    $("#btnMostrarForm").on("click", function(e){
+        e.preventDefault();
+        $("#formPuestos").toggleClass("d-none");
+        $(this).text($("#formPuestos").hasClass("d-none") ? "➕ Nuevo Puesto" : "❌ Ocultar formulario");
+    });
+});
+</script>
+
 </div>
 </body>
 </html>

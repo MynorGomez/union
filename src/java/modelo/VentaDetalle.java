@@ -11,10 +11,8 @@ public class VentaDetalle {
     private double precio_unitario;
     private double subtotal;
     
-    private ConexionDB cn;
-
     public VentaDetalle() {
-        this.cn = new ConexionDB();
+        // No mantenemos una ConexionDB con estado; cada método solicitará su propia Connection.
     }
 
     public int getId_detalle() { return id_detalle; }
@@ -54,7 +52,7 @@ public class VentaDetalle {
     private double obtenerPrecioProducto(int idProducto) {
         double precio = 0;
         String query = "SELECT precio_venta FROM productos WHERE id_producto = ?";
-        try (Connection con = cn.getConexion();
+        try (Connection con = new ConexionDB().getConexion();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, idProducto);
             ResultSet rs = ps.executeQuery();
@@ -69,7 +67,7 @@ public class VentaDetalle {
 
     public boolean existe(int idVenta, int idProducto) {
         String query = "SELECT COUNT(*) FROM ventas_detalle WHERE id_venta = ? AND id_producto = ?";
-        try (Connection con = cn.getConexion();
+        try (Connection con = new ConexionDB().getConexion();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, idVenta);
             ps.setInt(2, idProducto);
@@ -87,7 +85,7 @@ public class VentaDetalle {
         String query = "UPDATE ventas_detalle SET cantidad = cantidad + ?, " +
                       "subtotal = (cantidad + ?) * precio_unitario " +
                       "WHERE id_venta = ? AND id_producto = ?";
-        try (Connection con = cn.getConexion();
+        try (Connection con = new ConexionDB().getConexion();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, cantidadAdicional);
             ps.setInt(2, cantidadAdicional);
@@ -120,7 +118,7 @@ public class VentaDetalle {
         
         String query = "INSERT INTO ventas_detalle (id_venta, id_producto, cantidad, " +
                       "precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
-        try (Connection con = cn.getConexion();
+        try (Connection con = new ConexionDB().getConexion();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id_venta);
             ps.setInt(2, id_producto);
@@ -134,18 +132,56 @@ public class VentaDetalle {
             throw e; // Re-lanzar la excepción para manejarla en la transacción
         }
     }
+
+    // Versión que usa la Connection de la transacción (no la cierra)
+    public boolean agregar(Connection con) throws SQLException {
+        // Validar que el producto existe usando la misma conexión
+        if (!existeProducto(con, id_producto)) {
+            throw new SQLException("El producto con ID " + id_producto + " no existe");
+        }
+        if (cantidad <= 0) {
+            throw new SQLException("La cantidad debe ser mayor que 0");
+        }
+        if (precio_unitario <= 0) {
+            throw new SQLException("El precio debe ser mayor que 0");
+        }
+        this.subtotal = this.cantidad * this.precio_unitario;
+
+        String query = "INSERT INTO ventas_detalle (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, id_venta);
+            ps.setInt(2, id_producto);
+            ps.setInt(3, cantidad);
+            ps.setDouble(4, precio_unitario);
+            ps.setDouble(5, subtotal);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error al agregar detalle (conexión externa): " + e.getMessage());
+            throw e;
+        }
+    }
     
     private boolean existeProducto(int idProducto) {
+        // Por compatibilidad, llama a la versión que crea su propia conexión
+        try (Connection con = new ConexionDB().getConexion()) {
+            return existeProducto(con, idProducto);
+        } catch (SQLException e) {
+            System.out.println("Error al verificar producto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean existeProducto(Connection con, int idProducto) {
         String query = "SELECT COUNT(*) FROM productos WHERE id_producto = ?";
-        try (Connection con = cn.getConexion();
-             PreparedStatement ps = con.prepareStatement(query)) {
+        try (PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, idProducto);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            System.out.println("Error al verificar producto: " + e.getMessage());
+            System.out.println("Error al verificar producto (conexión externa): " + e.getMessage());
         }
         return false;
     }

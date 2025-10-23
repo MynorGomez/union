@@ -1,311 +1,322 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, modelo.*, utils.ConexionDB, java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="modelo.Venta,java.util.List,java.sql.*,utils.ConexionDB" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Ventas</title>
+    <title>Gestión de Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body { background-color: #f8fafc; font-family: 'Poppins', sans-serif; }
-        .container { margin-top: 40px; }
-        .card { border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .btn-agregar { border-radius: 30px; }
-        input[readonly] { background-color: #f5f5f5; }
-        #mensajeCliente {
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
+        body { background-color: #f8f9fa; }
+        .main-content { margin-left: 250px; padding: 20px; position: relative; z-index: 1; }
+        .modal { z-index: 2000 !important; }
+        .modal-backdrop { z-index: 1050 !important; }
+        .sidebar { z-index: 100 !important; }
+        .border-success { border: 2px solid #28a745 !important; }
+        .border-danger { border: 2px solid #dc3545 !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header bg-success text-white text-center">
-            <h4>Registro de Ventas</h4>
+<%@ include file="../includes/menu.jsp" %>
+
+<div class="main-content">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-cash-stack"></i> Ventas</h4>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNuevaVenta">
+                <i class="bi bi-plus-circle"></i> Nueva Venta
+            </button>
         </div>
+
         <div class="card-body">
-
-            <form id="ventaForm" action="${pageContext.request.contextPath}/sr_venta" method="post">
-
-                <!-- DATOS DEL CLIENTE -->
-                <h5 class="text-secondary">Datos del cliente</h5>
-                <div id="mensajeCliente" class="alert d-none mt-2" role="alert"></div>
-
-                <div class="row mb-3 align-items-end">
-                    <div class="col-md-4">
-                        <label for="nit" class="form-label">NIT:</label>
-                        <div class="input-group">
-    <input type="text" id="nit" name="nit" class="form-control" placeholder="Ingrese NIT" required>
-    <button type="button" id="btnBuscarCliente" class="btn btn-outline-primary">🔍 Buscar</button>
-    <!-- 🔹 Badge dinámico -->
-    <span id="estadoCliente" class="badge bg-secondary ms-2 align-self-center d-none">Esperando búsqueda...</span>
-</div>
-
-                    <div class="col-md-4">
-                        <label for="nombres" class="form-label">Nombres:</label>
-                        <input type="text" id="nombres" name="nombres" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="apellidos" class="form-label">Apellidos:</label>
-                        <input type="text" id="apellidos" name="apellidos" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="direccion" class="form-label">Dirección:</label>
-                        <input type="text" id="direccion" name="direccion" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="telefono" class="form-label">Teléfono:</label>
-                        <input type="text" id="telefono" name="telefono" class="form-control">
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- DATOS DE LA VENTA -->
-                <h5 class="text-secondary">Datos de la venta</h5>
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label class="form-label">No. Factura</label>
-                        <input type="text" name="no_factura" class="form-control" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Serie</label>
-                        <input type="text" name="serie" class="form-control" value="A">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Empleado</label>
-                        <select name="id_empleado" class="form-select" required>
-                            <%
-                                ConexionDB cn = new ConexionDB();
-                                Connection con = cn.getConexion();
-                                PreparedStatement ps = con.prepareStatement("SELECT id_empleado, nombres FROM empleados");
-                                ResultSet rs = ps.executeQuery();
-                                while (rs.next()) {
-                            %>
-                                <option value="<%=rs.getInt("id_empleado")%>"><%=rs.getString("nombres")%></option>
-                            <% } con.close(); %>
-                        </select>
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- DETALLE DE PRODUCTOS -->
-                <h5 class="text-secondary">Detalle de productos</h5>
-                <table class="table table-bordered" id="tablaProductos">
-                    <thead class="table-success text-center">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle">
+                    <thead class="table-dark text-center">
                         <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio</th>
-                            <th>Subtotal</th>
-                            <th>Acción</th>
+                            <th>No. Factura</th>
+                            <th>Serie</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Empleado</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="detalle">
-                        <tr>
+                    <tbody>
+                        <%
+                            Venta venta = new Venta();
+                            List<Venta> ventas = venta.listar();
+                            for (Venta v : ventas) {
+                        %>
+                        <tr class="text-center">
+                            <td><%= v.getNo_factura() %></td>
+                            <td><%= v.getSerie() %></td>
+                            <td><%= v.getFecha_venta() %></td>
+                            <td><%= v.getCliente() %></td>
+                            <td><%= v.getEmpleado() %></td>
+                            <td>Q <%= String.format("%.2f", v.getTotal()) %></td>
                             <td>
-                                <select name="id_producto[]" class="form-select producto">
-                                    <%
-                                        cn = new ConexionDB();
-                                        con = cn.getConexion();
-                                        ps = con.prepareStatement("SELECT id_producto, producto, precio_venta FROM productos");
-                                        rs = ps.executeQuery();
-                                        while (rs.next()) {
-                                    %>
-                                        <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_venta")%>">
-                                            <%=rs.getString("producto")%>
-                                        </option>
-                                    <% } con.close(); %>
-                                </select>
+                                <button type="button" class="btn btn-info btn-sm" onclick="verDetalle(<%= v.getId_venta() %>)">
+                                    <i class="bi bi-eye"></i> Ver Detalle
+                                </button>
                             </td>
-                            <td><input type="number" name="cantidad[]" class="form-control cantidad" value="1" min="1"></td>
-                            <td><input type="text" name="precio[]" class="form-control precio" readonly></td>
-                            <td><input type="text" name="subtotal[]" class="form-control subtotal" readonly></td>
-                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm eliminar">🗑️</button></td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <button type="button" id="agregar" class="btn btn-success btn-agregar">➕ Agregar producto</button>
-                    <div>
-                        <label class="form-label me-2 fw-bold">Total:</label>
-                        <input type="text" id="total" name="total" class="form-control d-inline-block" style="width:150px" readonly>
-                    </div>
-                </div>
-
-                <div class="mt-4 text-center">
-                    <button type="submit" class="btn btn-primary px-5">💾 Guardar venta</button>
-                    <a href="../index.jsp" class="btn btn-secondary px-5">🔙 Volver</a>
-                </div>
-
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ========== JAVASCRIPT ========== -->
+<!-- 🧾 Modal NUEVA VENTA -->
+<div class="modal fade" id="modalNuevaVenta" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-receipt"></i> Nueva Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ventaForm" action="../sr_venta" method="post">
+                    <h6 class="text-secondary mb-3">Datos del Cliente</h6>
+                    <div id="mensajeCliente" class="alert d-none"></div>
+
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">NIT</label>
+                            <div class="input-group">
+                                <input type="text" id="nit" name="nit" class="form-control" required>
+                                <button type="button" id="btnBuscarCliente" class="btn btn-outline-primary">🔍</button>
+                                <span id="estadoCliente" class="badge bg-secondary ms-2 d-none">Esperando...</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nombres</label>
+                            <input type="text" id="nombres" name="nombres" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Apellidos</label>
+                            <input type="text" id="apellidos" name="apellidos" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" id="direccion" name="direccion" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" id="telefono" name="telefono" class="form-control">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="text-secondary mb-3">Datos de la Venta</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">No. Factura</label>
+                            <%
+                                ConexionDB cn = new ConexionDB();
+                                Connection con = cn.getConexion();
+                                PreparedStatement ps = con.prepareStatement("SELECT IFNULL(MAX(no_factura), 0) + 1 AS siguiente FROM ventas");
+                                ResultSet rs = ps.executeQuery();
+                                int siguienteFactura = 1;
+                                if (rs.next()) siguienteFactura = rs.getInt("siguiente");
+                                con.close();
+                            %>
+                            <input type="text" name="no_factura" class="form-control" value="<%= siguienteFactura %>" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Serie</label>
+                            <input type="text" name="serie" class="form-control" value="A" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Empleado</label>
+                            <select name="id_empleado" class="form-select" required>
+                                <%
+                                    cn = new ConexionDB();
+                                    con = cn.getConexion();
+                                    ps = con.prepareStatement("SELECT id_empleado, nombres FROM empleados");
+                                    rs = ps.executeQuery();
+                                    while (rs.next()) {
+                                %>
+                                    <option value="<%=rs.getInt("id_empleado")%>"><%=rs.getString("nombres")%></option>
+                                <% } con.close(); %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="text-secondary mb-3">Detalle de Productos</h6>
+                    <table class="table table-bordered" id="tablaProductos">
+                        <thead class="table-success text-center">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select name="id_producto[]" class="form-select producto">
+                                        <%
+                                            cn = new ConexionDB();
+                                            con = cn.getConexion();
+                                            ps = con.prepareStatement("SELECT id_producto, producto, precio_venta FROM productos");
+                                            rs = ps.executeQuery();
+                                            while (rs.next()) {
+                                        %>
+                                            <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_venta")%>">
+                                                <%=rs.getString("producto")%>
+                                            </option>
+                                        <% } con.close(); %>
+                                    </select>
+                                </td>
+                                <td><input type="number" name="cantidad[]" class="form-control cantidad" value="1" min="1"></td>
+                                <td><input type="text" name="precio[]" class="form-control precio" readonly></td>
+                                <td><input type="text" name="subtotal[]" class="form-control subtotal" readonly></td>
+                                <td class="text-center"><button type="button" class="btn btn-danger btn-sm eliminar">🗑️</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="button" id="agregar" class="btn btn-success">➕ Agregar producto</button>
+                        <div>
+                            <label class="form-label me-2 fw-bold">Total:</label>
+                            <input type="text" id="total" name="total" class="form-control d-inline-block" style="width:150px" readonly>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary px-5">💾 Guardar venta</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Modal Detalle -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title">Detalle de Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalleVenta"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // Función para recalcular subtotal y total
-    function recalcular() {
-        let total = 0;
-        $("#tablaProductos tbody tr").each(function() {
-            let cantidad = parseInt($(this).find(".cantidad").val()) || 0;
-            let precio = parseFloat($(this).find(".precio").val()) || 0;
-            let subtotal = cantidad * precio;
-            $(this).find(".subtotal").val(subtotal.toFixed(2));
-            total += subtotal;
-        });
-        $("#total").val(total.toFixed(2));
-    }
-
-    // Actualizar precio cuando se selecciona un producto
-    $(document).on('change', '.producto', function() {
-        let precioBase = $(this).find(':selected').data('precio');
-        $(this).closest('tr').find('.precio').val(precioBase);
-        recalcular();
-    });
-
-    // Recalcular cuando cambia la cantidad
-    $(document).on('input', '.cantidad', function() {
-        recalcular();
-    });
-
-    // Eliminar fila
-    $(document).on('click', '.eliminar', function() {
-        if($("#tablaProductos tbody tr").length > 1) {
-            $(this).closest('tr').remove();
-        } else {
-            $(this).closest('tr').find('input').val('');
-            $(this).closest('tr').find('select').prop('selectedIndex', 0);
-        }
-        recalcular();
-    });
-
-    // Agregar nueva fila
-    $("#agregar").click(function() {
-        let newRow = $("#tablaProductos tbody tr:first").clone();
-        newRow.find('input').val('');
-        newRow.find('select').prop('selectedIndex', 0);
-        newRow.find('.cantidad').val('1');
-        $("#tablaProductos tbody").append(newRow);
-        recalcular();
-    });
-
-    // Trigger inicial para establecer precios
-    $('.producto').trigger('change');
-
-    $('#ventaForm').on('submit', function(e) {
-        // Los campos ya tienen los nombres correctos con []
-        return true;
-        
-        return false;
-    });
-
-    // Calcular subtotales y total
-    function calcularTotales() {
-        let total = 0;
-        $("#tablaProductos tbody tr").each(function() {
-            let cantidad = parseFloat($(this).find(".cantidad").val()) || 0;
-            let precio = parseFloat($(this).find(".precio").val()) || 0;
-            let subtotal = cantidad * precio;
-            $(this).find(".subtotal").val(subtotal.toFixed(2));
-            total += subtotal;
-        });
-        $("#total").val(total.toFixed(2));
-    }
-
-    // Al cambiar producto, mostrar precio
-    $(document).on("change", ".producto", function() {
-        let precio = $(this).find(":selected").data("precio");
-        $(this).closest("tr").find(".precio").val(precio);
-        calcularTotales();
-    });
-
-    // Al cambiar cantidad, recalcular
-    $(document).on("input", ".cantidad", function() {
-        calcularTotales();
-    });
-
-    // Agregar nueva fila
-    $("#agregar").click(function() {
-        let fila = $("#detalle tr:first").clone();
-        fila.find("input").val("");
-        $("#tablaProductos tbody").append(fila);
-    });
-
-    // Eliminar fila
-    $(document).on("click", ".eliminar", function() {
-        if ($("#tablaProductos tbody tr").length > 1) {
-            $(this).closest("tr").remove();
-            calcularTotales();
-        }
-    });
-
-// 🔍 Buscar cliente por NIT al hacer clic en el botón
-$("#btnBuscarCliente").click(function() {
+// ✅ Buscar cliente funcional
+$(document).on("click", "#btnBuscarCliente", function() {
     const nit = $("#nit").val().trim();
     const badge = $("#estadoCliente");
+    const mensaje = $("#mensajeCliente");
 
     if (nit === "") {
-        mostrarMensaje("⚠️ Por favor ingrese un NIT antes de buscar.", "warning");
-        badge.removeClass().addClass("badge bg-warning ms-2 align-self-center").text("NIT vacío");
+        mensaje.removeClass().addClass("alert alert-warning").text("⚠️ Ingresa un NIT antes de buscar.").show();
         return;
     }
 
-    // Mostrar estado de búsqueda
-    badge.removeClass().addClass("badge bg-info text-dark ms-2 align-self-center").text("Buscando...");
+    badge.removeClass().addClass("badge bg-info text-dark").text("Buscando...").show();
 
     $.ajax({
-        url: "../buscarCliente.jsp",
+        url: "../buscarCliente.jsp", // asegúrate de tener este JSP en /Sistema/buscarCliente.jsp
         method: "GET",
         data: { nit: nit },
         success: function(data) {
-            if (data.trim() !== "") {
-                // Cliente encontrado ✅
+            data = data.trim();
+            if (data !== "" && !data.startsWith("ERROR")) {
                 const partes = data.split("|");
                 $("#nombres").val(partes[0]).prop("readonly", true);
                 $("#apellidos").val(partes[1]).prop("readonly", true);
                 $("#direccion").val(partes[2]).prop("readonly", true);
                 $("#telefono").val(partes[3]).prop("readonly", true);
-
-                badge.removeClass().addClass("badge bg-success ms-2 align-self-center").text("Cliente existente ✅");
-                mostrarMensaje("✅ Cliente encontrado correctamente.", "success");
+                badge.removeClass().addClass("badge bg-success").text("Cliente encontrado ✅");
+                mensaje.removeClass().addClass("alert alert-success").text("✅ Cliente encontrado.").show();
             } else {
-                // Cliente no encontrado ⚠️
-                $("#nombres, #apellidos, #direccion, #telefono")
-                    .val("")
-                    .prop("readonly", false);
-
-                badge.removeClass().addClass("badge bg-warning text-dark ms-2 align-self-center").text("Nuevo cliente ⚠️");
-                mostrarMensaje("⚠️ Cliente no encontrado. Complete los datos para registrarlo automáticamente.", "warning");
+                $("#nombres, #apellidos, #direccion, #telefono").val("").prop("readonly", false);
+                badge.removeClass().addClass("badge bg-warning text-dark").text("Nuevo cliente ⚠️");
+                mensaje.removeClass().addClass("alert alert-warning").text("⚠️ Cliente no encontrado, ingresa los datos.").show();
             }
         },
         error: function() {
-            badge.removeClass().addClass("badge bg-danger ms-2 align-self-center").text("Error ❌");
-            mostrarMensaje("❌ Error al buscar el cliente. Verifique conexión o archivo buscarCliente.jsp.", "danger");
+            badge.removeClass().addClass("badge bg-danger").text("Error ❌");
+            mensaje.removeClass().addClass("alert alert-danger").text("❌ Error al conectar con buscarCliente.jsp").show();
         }
     });
 });
 
-// 🧩 Función para mostrar mensajes visuales
-function mostrarMensaje(texto, tipo) {
-    const mensajeDiv = $("#mensajeCliente");
-    mensajeDiv
-        .removeClass("d-none alert-success alert-warning alert-danger")
-        .addClass(`alert-${tipo}`)
-        .html(texto);
-    setTimeout(() => mensajeDiv.addClass("d-none"), 5000);
+// ✅ Calcular precios/subtotales
+function setPrecioYSubtotal($row) {
+    const $sel = $row.find('.producto');
+    const precio = parseFloat($sel.find(':selected').data('precio')) || 0;
+    const cant = parseInt($row.find('.cantidad').val()) || 0;
+    const sub = precio * cant;
+    $row.find('.precio').val(precio.toFixed(2));
+    $row.find('.subtotal').val(sub.toFixed(2));
 }
 
+function recalcular() {
+    let total = 0;
+    $("#tablaProductos tbody tr").each(function() {
+        const $row = $(this);
+        setPrecioYSubtotal($row);
+        total += parseFloat($row.find(".subtotal").val()) || 0;
+    });
+    $("#total").val(total.toFixed(2));
+}
+
+$(document).on('change', '.producto', function() {
+    setPrecioYSubtotal($(this).closest('tr'));
+    recalcular();
+});
+
+$(document).on('input', '.cantidad', function() {
+    setPrecioYSubtotal($(this).closest('tr'));
+    recalcular();
+});
+
+$("#agregar").click(function() {
+    let $row = $("#tablaProductos tbody tr:first").clone();
+    $row.find('input').val('');
+    $row.find('select').prop('selectedIndex', 0);
+    $row.find('.cantidad').val('1');
+    setPrecioYSubtotal($row);
+    $("#tablaProductos tbody").append($row);
+    recalcular();
+});
+function verDetalle(idVenta) {
+    $.ajax({
+        url: "../views/detalleVenta.jsp",
+        type: "GET",
+        data: { id_venta: idVenta },
+        success: function(resp) {
+            $("#detalleVenta").html(resp);
+            new bootstrap.Modal('#modalDetalle').show();
+        },
+        error: function() {
+            alert('Error al cargar detalle');
+        }
+    });
+}
+
+
 </script>
-</div>
+
 </body>
 </html>

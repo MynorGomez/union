@@ -1,5 +1,5 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="modelo.Venta,modelo.VentaDetalle,java.util.List"%>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="modelo.Venta,modelo.VentaDetalle,java.util.List, java.sql.*, utils.ConexionDB" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,10 +17,18 @@
                 <div class="card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Listado de Ventas</h4>
-                        <a href="nueva_venta.jsp" class="btn btn-success">
+                        <!-- Botón que despliega el formulario de nueva venta -->
+                        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVentaForm" aria-expanded="false" aria-controls="collapseVentaForm">
                             <i class="bi bi-plus-circle"></i> Nueva Venta
-                        </a>
+                        </button>
                     </div>
+                    <!-- Collapsible form (incluye el formulario de ventas) -->
+                    <div class="collapse" id="collapseVentaForm">
+                        <div class="card card-body">
+                            <%@ include file="partials/venta_form.jsp" %>
+                        </div>
+                    </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -82,6 +90,54 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funciones reutilizadas del formulario de ventas
+        function recalcular() {
+            let total = 0;
+            $("#tablaProductos tbody tr").each(function() {
+                let cantidad = parseInt($(this).find(".cantidad").val()) || 0;
+                let precio = parseFloat($(this).find(".precio").val()) || 0;
+                let subtotal = cantidad * precio;
+                $(this).find(".subtotal").val(subtotal.toFixed(2));
+                total += subtotal;
+            });
+            $("#total").val(total.toFixed(2));
+        }
+
+        $(document).on('change', '.producto', function() {
+            let precioBase = $(this).find(':selected').data('precio');
+            $(this).closest('tr').find('.precio').val(precioBase);
+            recalcular();
+        });
+
+        $(document).on('input', '.cantidad', function() {
+            recalcular();
+        });
+
+        $(document).on('click', '.eliminar', function() {
+            if($("#tablaProductos tbody tr").length > 1) {
+                $(this).closest('tr').remove();
+            } else {
+                $(this).closest('tr').find('input').val('');
+                $(this).closest('tr').find('select').prop('selectedIndex', 0);
+            }
+            recalcular();
+        });
+
+        $(document).on('click', '#agregar', function() {
+            let newRow = $("#tablaProductos tbody tr:first").clone();
+            newRow.find('input').val('');
+            newRow.find('select').prop('selectedIndex', 0);
+            newRow.find('.cantidad').val('1');
+            $("#tablaProductos tbody").append(newRow);
+            recalcular();
+        });
+
+        // Inicializar precios si el formulario está visible al cargar
+        $(document).ready(function() {
+            $('.producto').trigger('change');
+        });
+    </script>
     <script>
         function verDetalle(idVenta) {
             $.ajax({

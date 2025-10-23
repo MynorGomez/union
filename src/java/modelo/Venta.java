@@ -54,8 +54,19 @@ public class Venta {
 
     // Insertar venta
     public boolean agregar() {
+        // Delegar a la versión que recibe Connection para compatibilidad con transacciones
+        try (Connection con = cn.getConexion()) {
+            return agregar(con);
+        } catch (SQLException e) {
+            System.out.println("❌ Error al agregar venta: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    // Versión que usa la Connection proporcionada (no cierra la conexión)
+    public boolean agregar(Connection con) {
         String sql = "INSERT INTO ventas (no_factura, serie, fecha_venta, id_cliente, id_empleado, total) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, no_factura);
             ps.setString(2, serie);
             ps.setTimestamp(3, fecha_venta);
@@ -63,8 +74,7 @@ public class Venta {
             ps.setInt(5, id_empleado);
             ps.setDouble(6, total);
             ps.executeUpdate();
-            
-            // Obtener el ID generado
+
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     this.id_venta = rs.getInt(1);
@@ -72,12 +82,42 @@ public class Venta {
             }
             return true;
         } catch (SQLException e) {
-            System.out.println("❌ Error al agregar venta: " + e.getMessage());
+            System.out.println("❌ Error al agregar venta (conexión externa): " + e.getMessage());
             return false;
         }
     }
     
     public int getUltimoId() {
         return this.id_venta;
+    }
+
+    // Devuelve la lista de ventas (incluye nombres de cliente y empleado si existen)
+    public List<Venta> listar() {
+        List<Venta> lista = new ArrayList<>();
+        String sql = "SELECT v.id_venta, v.no_factura, v.serie, v.fecha_venta, v.id_cliente, v.id_empleado, v.total, "
+                   + "COALESCE(c.nombres, '') AS cliente, COALESCE(e.nombres, '') AS empleado "
+                   + "FROM ventas v "
+                   + "LEFT JOIN clientes c ON v.id_cliente = c.id_cliente "
+                   + "LEFT JOIN empleados e ON v.id_empleado = e.id_empleado "
+                   + "ORDER BY v.id_venta DESC";
+        try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Venta v = new Venta(
+                    rs.getInt("id_venta"),
+                    rs.getString("no_factura"),
+                    rs.getString("serie"),
+                    rs.getTimestamp("fecha_venta"),
+                    rs.getInt("id_cliente"),
+                    rs.getInt("id_empleado"),
+                    rs.getDouble("total"),
+                    rs.getString("cliente"),
+                    rs.getString("empleado")
+                );
+                lista.add(v);
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Error al listar ventas: " + e.getMessage());
+        }
+        return lista;
     }
 }

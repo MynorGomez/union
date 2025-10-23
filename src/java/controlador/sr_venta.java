@@ -1,15 +1,29 @@
 package controlador;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import modelo.*;
-
-@WebServlet(name = "sr_venta", urlPatterns = {"/sr_venta"})
 public class sr_venta extends HttpServlet {
+    
+    private int obtenerIdCliente(String nit) {
+        String sql = "SELECT id_cliente FROM clientes WHERE nit = ?";
+        try (Connection con = new utils.ConexionDB().getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nit);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_cliente");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar cliente: " + e.getMessage());
+        }
+        return 0;
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -53,23 +67,29 @@ public class sr_venta extends HttpServlet {
             v.setTotal(Double.parseDouble(request.getParameter("total")));
 
             if (v.agregar()) {
-                int idVenta = obtenerUltimoIdVenta();
+                int idVenta = v.getUltimoId();
 
-                // Insertar los detalles
-                String[] productos = request.getParameterValues("id_producto");
-                String[] cantidades = request.getParameterValues("cantidad");
-                String[] precios = request.getParameterValues("precio");
-
-                if (productos != null) {
-                    for (int i = 0; i < productos.length; i++) {
-                        VentaDetalle d = new VentaDetalle();
-                        d.setId_venta(idVenta);
-                        d.setId_producto(Integer.parseInt(productos[i]));
-                        d.setCantidad(Integer.parseInt(cantidades[i]));
-                        double precio = Double.parseDouble(precios[i]);
-                        d.setPrecio_unitario(precio);
-                        d.setSubtotal(precio * d.getCantidad());
-                        d.agregar();
+                // Procesar detalles de JSON
+                String detallesJson = request.getParameter("detalles");
+                if (detallesJson != null && !detallesJson.isEmpty()) {
+                    try {
+                        org.json.JSONArray detalles = new org.json.JSONArray(detallesJson);
+                        for (int i = 0; i < detalles.length(); i++) {
+                            org.json.JSONObject detalle = detalles.getJSONObject(i);
+                            
+                            VentaDetalle d = new VentaDetalle();
+                            d.setId_venta(idVenta);
+                            d.setId_producto(detalle.getInt("id_producto"));
+                            d.setCantidad(detalle.getInt("cantidad"));
+                            d.setPrecio_unitario(detalle.getDouble("precio"));
+                            d.setSubtotal(detalle.getDouble("subtotal"));
+                            
+                            // Verificar si ya existe el producto en la venta
+                            if (d.existe(idVenta, d.getId_producto())) {
+                                d.actualizarCantidad(idVenta, d.getId_producto(), d.getCantidad());
+                            } else {
+                                d.agregar();
+                            }
                     }
                 }
             }
@@ -81,18 +101,7 @@ public class sr_venta extends HttpServlet {
         response.sendRedirect("views/ventas.jsp");
     }
 
-    private int obtenerIdCliente(String nit) {
-        String sql = "SELECT id_cliente FROM clientes WHERE nit=?";
-        try (Connection con = new utils.ConexionDB().getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, nit);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt("id_cliente");
-        } catch (Exception e) {
-            System.out.println("❌ Error al buscar cliente: " + e.getMessage());
-        }
-        return 0;
-    }
+
 
     private int obtenerUltimoIdVenta() {
         String sql = "SELECT MAX(id_venta) FROM ventas";

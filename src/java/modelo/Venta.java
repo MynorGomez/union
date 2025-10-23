@@ -55,7 +55,7 @@ public class Venta {
     // Insertar venta
     public boolean agregar() {
         String sql = "INSERT INTO ventas (no_factura, serie, fecha_venta, id_cliente, id_empleado, total) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = cn.getConexion(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, no_factura);
             ps.setString(2, serie);
             ps.setTimestamp(3, fecha_venta);
@@ -63,10 +63,21 @@ public class Venta {
             ps.setInt(5, id_empleado);
             ps.setDouble(6, total);
             ps.executeUpdate();
+            
+            // Obtener el ID generado
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    this.id_venta = rs.getInt(1);
+                }
+            }
             return true;
         } catch (SQLException e) {
             System.out.println("❌ Error al agregar venta: " + e.getMessage());
             return false;
         }
+    }
+    
+    public int getUltimoId() {
+        return this.id_venta;
     }
 }

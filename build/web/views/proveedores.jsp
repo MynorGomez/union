@@ -1,109 +1,129 @@
 <%@ include file="../includes/menu.jsp" %>
-<div class="main-content">
 <%@ page import="modelo.Proveedor,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Mantenimiento de Proveedores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style> 
+    <style>
+        body { background-color: #f8f9fa; }
+        .main-content { margin-left: 250px; padding: 25px; }
         tr:hover { background-color: #e8f4ff; cursor: pointer; }
-        #formProveedores { transition: all 0.3s ease; }
     </style>
 </head>
-<body class="bg-light">
 
-<div class="container mt-5">
-    <h2 class="mb-4 text-center text-primary">Mantenimiento de Proveedores</h2>
+<body>
+<div class="main-content">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-truck"></i> Proveedores</h4>
+            <button class="btn btn-success" onclick="nuevoProveedor()">
+                <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+            </button>
+        </div>
 
-    <!-- 🔘 BOTÓN PARA MOSTRAR/OCULTAR FORMULARIO -->
-    <div class="text-end mb-3">
-        <button id="btnMostrarForm" class="btn btn-success">
-            ➕ Nuevo Proveedor
-        </button>
-    </div>
-
-    <!-- Formulario -->
-    <form action="../sr_proveedor" method="post" class="card p-4 shadow-sm d-none" id="formProveedores">
-        <input type="hidden" name="id_proveedor" id="id_proveedor">
-
-        <div class="row g-3">
-            <div class="col-md-3"><input type="text" name="txt_proveedor" id="txt_proveedor" class="form-control" placeholder="Proveedor" required></div>
-            <div class="col-md-3"><input type="text" name="txt_nit" id="txt_nit" class="form-control" placeholder="NIT" required></div>
-            <div class="col-md-3"><input type="text" name="txt_direccion" id="txt_direccion" class="form-control" placeholder="Dirección" required></div>
-            <div class="col-md-3"><input type="text" name="txt_telefono" id="txt_telefono" class="form-control" placeholder="Teléfono" required></div>
-
-            <div class="col-md-3 d-flex gap-2">
-                <button name="btn" id="btnAccion" value="Agregar" class="btn btn-success w-100">Agregar</button>
-                <button name="btn" value="Eliminar" id="btnEliminar" class="btn btn-danger w-100 d-none" onclick="return confirm('¿Eliminar este proveedor?')">Eliminar</button>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle text-center" id="tablaProveedores">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Proveedor</th>
+                            <th>NIT</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                            Proveedor pr = new Proveedor();
+                            List<Proveedor> lista = pr.leer();
+                            for (Proveedor p : lista) {
+                        %>
+                        <tr onclick="editarProveedor(this)"
+                            data-id="<%= p.getId_proveedor() %>"
+                            data-proveedor="<%= p.getProveedor() %>"
+                            data-nit="<%= p.getNit() %>"
+                            data-direccion="<%= p.getDireccion() %>"
+                            data-telefono="<%= p.getTelefono() %>">
+                            <td><%= p.getId_proveedor() %></td>
+                            <td><%= p.getProveedor() %></td>
+                            <td><%= p.getNit() %></td>
+                            <td><%= p.getDireccion() %></td>
+                            <td><%= p.getTelefono() %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </form>
+    </div>
+</div>
 
-    <!-- Tabla -->
-    <div class="card mt-4 shadow-sm">
-        <div class="card-body">
-            <table class="table table-striped align-middle text-center" id="tablaProveedores">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th><th>Proveedor</th><th>NIT</th><th>Dirección</th><th>Teléfono</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                        Proveedor pr = new Proveedor();
-                        List<Proveedor> lista = pr.leer();
-                        for (Proveedor p : lista) {
-                    %>
-                    <tr onclick="seleccionarProveedor(this)"
-                        data-id="<%= p.getId_proveedor() %>"
-                        data-proveedor="<%= p.getProveedor() %>"
-                        data-nit="<%= p.getNit() %>"
-                        data-direccion="<%= p.getDireccion() %>"
-                        data-telefono="<%= p.getTelefono() %>">
-                        <td><%= p.getId_proveedor() %></td>
-                        <td><%= p.getProveedor() %></td>
-                        <td><%= p.getNit() %></td>
-                        <td><%= p.getDireccion() %></td>
-                        <td><%= p.getTelefono() %></td>
-                    </tr>
-                    <% } %>
-                </tbody>
-            </table>
+<!-- 🧾 MODAL PROVEEDOR -->
+<div class="modal fade" id="modalProveedor" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form action="../sr_proveedor" method="post" id="formProveedor">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="tituloModal"><i class="bi bi-person-add"></i> Nuevo Proveedor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="id_proveedor" id="id_proveedor">
+
+                    <div class="row g-3">
+                        <div class="col-md-6"><input type="text" name="txt_proveedor" id="txt_proveedor" class="form-control" placeholder="Proveedor" required></div>
+                        <div class="col-md-3"><input type="text" name="txt_nit" id="txt_nit" class="form-control" placeholder="NIT" required></div>
+                        <div class="col-md-6"><input type="text" name="txt_direccion" id="txt_direccion" class="form-control" placeholder="Dirección" required></div>
+                        <div class="col-md-3"><input type="text" name="txt_telefono" id="txt_telefono" class="form-control" placeholder="Teléfono" required></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="btn" value="Agregar" id="btnGuardar" class="btn btn-primary">💾 Guardar</button>
+                    <button type="submit" name="btn" value="Actualizar" id="btnActualizar" class="btn btn-warning d-none">🔄 Actualizar</button>
+                    <button type="submit" name="btn" value="Eliminar" id="btnEliminar" class="btn btn-danger d-none" onclick="return confirm('¿Eliminar este proveedor?')">🗑️ Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function seleccionarProveedor(fila) {
-    document.getElementById("id_proveedor").value = fila.dataset.id;
-    document.getElementById("txt_proveedor").value = fila.dataset.proveedor;
-    document.getElementById("txt_nit").value = fila.dataset.nit;
-    document.getElementById("txt_direccion").value = fila.dataset.direccion;
-    document.getElementById("txt_telefono").value = fila.dataset.telefono;
+const modalProveedor = new bootstrap.Modal(document.getElementById('modalProveedor'));
 
-    document.getElementById("btnAccion").value = "Actualizar";
-    document.getElementById("btnAccion").textContent = "Actualizar";
-    document.getElementById("btnAccion").classList.replace("btn-success", "btn-warning");
-    document.getElementById("btnEliminar").classList.remove("d-none");
-    
-    // Mostrar el formulario si está oculto
-    $("#formProveedores").removeClass("d-none");
-    $("#btnMostrarForm").text("❌ Ocultar formulario");
+// 🟢 Nuevo proveedor
+function nuevoProveedor(){
+    $("#tituloModal").text("Nuevo Proveedor");
+    $("#formProveedor")[0].reset();
+    $("#id_proveedor").val("");
+    $("#btnGuardar").removeClass("d-none");
+    $("#btnActualizar, #btnEliminar").addClass("d-none");
+    modalProveedor.show();
 }
 
-// Mostrar / ocultar formulario
-$(document).ready(function(){
-    $("#btnMostrarForm").on("click", function(e){
-        e.preventDefault();
-        $("#formProveedores").toggleClass("d-none");
-        $(this).text($("#formProveedores").hasClass("d-none") ? "➕ Nuevo Proveedor" : "❌ Ocultar formulario");
-    });
-});
+// 🟡 Editar proveedor
+function editarProveedor(fila){
+    $("#tituloModal").text("Editar Proveedor");
+    $("#id_proveedor").val(fila.dataset.id);
+    $("#txt_proveedor").val(fila.dataset.proveedor);
+    $("#txt_nit").val(fila.dataset.nit);
+    $("#txt_direccion").val(fila.dataset.direccion);
+    $("#txt_telefono").val(fila.dataset.telefono);
+    $("#btnGuardar").addClass("d-none");
+    $("#btnActualizar, #btnEliminar").removeClass("d-none");
+    modalProveedor.show();
+}
 </script>
-</div>
 </body>
 </html>

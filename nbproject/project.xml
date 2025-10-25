@@ -10,6 +10,13 @@
                     <file>${file.reference.mysql-connector-j-8.1.0.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
+                <library dirs="200">
+                    <file>${file.reference.json-20231013.jar}</file>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.json-20210307.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>

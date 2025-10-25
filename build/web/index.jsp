@@ -79,7 +79,7 @@
                         <i class="bi bi-cash-stack display-5 text-warning"></i>
                         <h5 class="mt-2">Ventas</h5>
                         <h3><%= totalVentas %></h3>
-                        <a href="views/ventas.jsp" class="btn btn-outline-warning btn-sm mt-2">Ver más</a>
+                        <a href="/sr_venta" class="btn btn-outline-warning btn-sm mt-2">Ver más</a>
                     </div>
                 </div>
             </div>

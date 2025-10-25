@@ -1,70 +1,86 @@
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="modelo.Venta,java.util.List,java.sql.*,utils.ConexionDB" %>
+<%@ page import="java.util.*, java.sql.*, modelo.Venta, utils.ConexionDB" %>
+<%@ include file="../includes/menu.jsp" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body { background-color: #f8f9fa; }
-        .main-content { margin-left: 250px; padding: 20px; position: relative; z-index: 1; }
-        .modal { z-index: 2000 !important; }
-        .modal-backdrop { z-index: 1050 !important; }
-        .sidebar { z-index: 100 !important; }
-        .border-success { border: 2px solid #28a745 !important; }
-        .border-danger { border: 2px solid #dc3545 !important; }
-    </style>
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
 
-<%@ include file="../includes/menu.jsp" %>
+<body class="bg-light">
 
 <div class="main-content">
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0"><i class="bi bi-cash-stack"></i> Ventas</h4>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNuevaVenta">
+    <div class="container my-4">
+        <h3 class="text-primary mb-4">Gestión de Ventas</h3>
+
+        <%
+            String msg = request.getParameter("msg");
+            String error = request.getParameter("error");
+            if (msg != null) {
+        %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } else if (error != null) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+
+        <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalVenta">
                 <i class="bi bi-plus-circle"></i> Nueva Venta
             </button>
+            <div>
+                <a href="clientes.jsp" class="btn btn-outline-secondary btn-sm">Ir a Clientes</a>
+                <a href="empleados.jsp" class="btn btn-outline-secondary btn-sm">Ir a Empleados</a>
+            </div>
         </div>
 
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>No. Factura</th>
-                            <th>Serie</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Empleado</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
+        <!-- Tabla de Ventas -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table id="tablaVentas" class="table table-striped table-hover align-middle">
+                    <thead class="table-primary">
+                    <tr>
+                        <th>ID</th><th>No. Factura</th><th>Serie</th><th>Fecha</th>
+                        <th>Cliente</th><th>Empleado</th><th>Total (Q)</th><th>Acciones</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <%
-                            Venta venta = new Venta();
-                            List<Venta> ventas = venta.listar();
+                    <%
+                        List<Venta> ventas = (List<Venta>) request.getAttribute("ventas");
+                        if (ventas != null && !ventas.isEmpty()) {
                             for (Venta v : ventas) {
-                        %>
-                        <tr class="text-center">
-                            <td><%= v.getNo_factura() %></td>
-                            <td><%= v.getSerie() %></td>
-                            <td><%= v.getFecha_venta() %></td>
-                            <td><%= v.getCliente() %></td>
-                            <td><%= v.getEmpleado() %></td>
-                            <td>Q <%= String.format("%.2f", v.getTotal()) %></td>
-                            <td>
-                                <button type="button" class="btn btn-info btn-sm" onclick="verDetalle(<%= v.getId_venta() %>)">
-                                    <i class="bi bi-eye"></i> Ver Detalle
+                    %>
+                    <tr>
+                        <td><%= v.getId_venta() %></td>
+                        <td><%= v.getNo_factura() %></td>
+                        <td><%= v.getSerie() %></td>
+                        <td><%= v.getFecha_venta() %></td>
+                        <td><%= v.getCliente() %></td>
+                        <td><%= v.getEmpleado() %></td>
+                        <td class="text-end"><%= String.format("%.2f", v.getTotal()) %></td>
+                        <td>
+                            <form action="sr_venta" method="post" class="d-inline">
+                                <input type="hidden" name="accion" value="eliminar">
+                                <input type="hidden" name="id_venta" value="<%= v.getId_venta() %>">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar venta?')">
+                                    <i class="bi bi-trash"></i>
                                 </button>
-                            </td>
-                        </tr>
-                        <% } %>
+                            </form>
+                        </td>
+                    </tr>
+                    <% } } else { %>
+                    <tr><td colspan="8" class="text-center text-muted">No hay ventas registradas</td></tr>
+                    <% } %>
                     </tbody>
                 </table>
             </div>
@@ -72,250 +88,181 @@
     </div>
 </div>
 
-<!-- 🧾 Modal NUEVA VENTA -->
-<div class="modal fade" id="modalNuevaVenta" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+<!-- Modal Nueva Venta -->
+<div class="modal fade" id="modalVenta" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-receipt"></i> Nueva Venta</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="ventaForm" action="../sr_venta" method="post">
-                    <h6 class="text-secondary mb-3">Datos del Cliente</h6>
-                    <div id="mensajeCliente" class="alert d-none"></div>
+            <form action="sr_venta" method="post">
+                <input type="hidden" name="accion" value="agregar">
 
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label">NIT</label>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Nueva Venta</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Datos del Cliente -->
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-3">
+                            <label>NIT</label>
                             <div class="input-group">
-                                <input type="text" id="nit" name="nit" class="form-control" required>
-                                <button type="button" id="btnBuscarCliente" class="btn btn-outline-primary">🔍</button>
-                                <span id="estadoCliente" class="badge bg-secondary ms-2 d-none">Esperando...</span>
+                                <input type="text" id="nit" name="nit" class="form-control" placeholder="CF o NIT">
+                                <button type="button" id="btnBuscarCliente" class="btn btn-outline-secondary">
+                                    <i class="bi bi-search"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Nombres</label>
-                            <input type="text" id="nombres" name="nombres" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Apellidos</label>
-                            <input type="text" id="apellidos" name="apellidos" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Dirección</label>
-                            <input type="text" id="direccion" name="direccion" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Teléfono</label>
-                            <input type="text" id="telefono" name="telefono" class="form-control">
-                        </div>
+                        <div class="col-md-3"><label>Nombres</label><input type="text" id="nombres" class="form-control" readonly></div>
+                        <div class="col-md-3"><label>Apellidos</label><input type="text" id="apellidos" class="form-control" readonly></div>
+                        <div class="col-md-3"><label>Teléfono</label><input type="text" id="telefono" class="form-control" readonly></div>
                     </div>
 
-                    <hr>
-
-                    <h6 class="text-secondary mb-3">Datos de la Venta</h6>
-                    <div class="row g-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label>Dirección</label><input type="text" id="direccion" class="form-control" readonly></div>
                         <div class="col-md-3">
-                            <label class="form-label">No. Factura</label>
+                            <label>No. Factura</label>
                             <%
-                                ConexionDB cn = new ConexionDB();
-                                Connection con = cn.getConexion();
-                                PreparedStatement ps = con.prepareStatement("SELECT IFNULL(MAX(no_factura), 0) + 1 AS siguiente FROM ventas");
-                                ResultSet rs = ps.executeQuery();
-                                int siguienteFactura = 1;
-                                if (rs.next()) siguienteFactura = rs.getInt("siguiente");
-                                con.close();
+                                String noFactura = "0001";
+                                try (Connection con = new ConexionDB().getConexion();
+                                     PreparedStatement ps = con.prepareStatement("SELECT LPAD(COALESCE(MAX(id_venta)+1,1),4,'0') nf FROM ventas");
+                                     ResultSet rs = ps.executeQuery()) {
+                                    if (rs.next()) noFactura = rs.getString("nf");
+                                } catch (Exception e) {}
                             %>
-                            <input type="text" name="no_factura" class="form-control" value="<%= siguienteFactura %>" readonly>
+                            <input type="text" name="no_factura" class="form-control" readonly value="<%= noFactura %>">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Serie</label>
-                            <input type="text" name="serie" class="form-control" value="A" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Empleado</label>
+                        <div class="col-md-3"><label>Serie</label><input type="text" name="serie" class="form-control" readonly value="A"></div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label>Empleado</label>
                             <select name="id_empleado" class="form-select" required>
+                                <option value="">-- Seleccione --</option>
                                 <%
-                                    cn = new ConexionDB();
-                                    con = cn.getConexion();
-                                    ps = con.prepareStatement("SELECT id_empleado, nombres FROM empleados");
-                                    rs = ps.executeQuery();
-                                    while (rs.next()) {
+                                    try (Connection con = new ConexionDB().getConexion();
+                                         PreparedStatement ps = con.prepareStatement("SELECT id_empleado, CONCAT(nombres,' ',apellidos) nom FROM empleados");
+                                         ResultSet rs = ps.executeQuery()) {
+                                        while (rs.next()) {
                                 %>
-                                    <option value="<%=rs.getInt("id_empleado")%>"><%=rs.getString("nombres")%></option>
-                                <% } con.close(); %>
+                                <option value="<%= rs.getInt("id_empleado") %>"><%= rs.getString("nom") %></option>
+                                <% } } catch (Exception e) { %><option>Error</option><% } %>
                             </select>
                         </div>
                     </div>
 
-                    <hr>
-
-                    <h6 class="text-secondary mb-3">Detalle de Productos</h6>
-                    <table class="table table-bordered" id="tablaProductos">
-                        <thead class="table-success text-center">
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Subtotal</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <select name="id_producto[]" class="form-select producto">
-                                        <%
-                                            cn = new ConexionDB();
-                                            con = cn.getConexion();
-                                            ps = con.prepareStatement("SELECT id_producto, producto, precio_venta FROM productos");
-                                            rs = ps.executeQuery();
-                                            while (rs.next()) {
-                                        %>
-                                            <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_venta")%>">
-                                                <%=rs.getString("producto")%>
-                                            </option>
-                                        <% } con.close(); %>
-                                    </select>
-                                </td>
-                                <td><input type="number" name="cantidad[]" class="form-control cantidad" value="1" min="1"></td>
-                                <td><input type="text" name="precio[]" class="form-control precio" readonly></td>
-                                <td><input type="text" name="subtotal[]" class="form-control subtotal" readonly></td>
-                                <td class="text-center"><button type="button" class="btn btn-danger btn-sm eliminar">🗑️</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" id="agregar" class="btn btn-success">➕ Agregar producto</button>
-                        <div>
-                            <label class="form-label me-2 fw-bold">Total:</label>
-                            <input type="text" id="total" name="total" class="form-control d-inline-block" style="width:150px" readonly>
+                    <!-- Detalle de Productos -->
+                    <div class="card">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <span>Detalle de Productos</span>
+                            <button type="button" class="btn btn-light btn-sm" id="btnAddRow">
+                                <i class="bi bi-plus"></i> Agregar producto
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead class="table-success">
+                                <tr><th>Producto</th><th>Cantidad</th><th>Precio (Q)</th><th>Subtotal</th><th></th></tr>
+                                </thead>
+                                <tbody id="detalleVenta"></tbody>
+                            </table>
+                            <div class="text-end">
+                                <strong>Total:</strong>
+                                <input type="text" name="total" id="total" class="form-control d-inline-block text-end" style="width:150px;" readonly value="0.00">
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary px-5">💾 Guardar venta</button>
-                    </div>
-
-                </form>
-            </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar Venta</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- ✅ Modal Detalle -->
-<div class="modal fade" id="modalDetalle" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-secondary text-white">
-                <h5 class="modal-title">Detalle de Venta</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="detalleVenta"></div>
-        </div>
-    </div>
-</div>
-
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-// ✅ Buscar cliente funcional
-$(document).on("click", "#btnBuscarCliente", function() {
-    const nit = $("#nit").val().trim();
-    const badge = $("#estadoCliente");
-    const mensaje = $("#mensajeCliente");
+$(document).ready(function() {
+    $('#tablaVentas').DataTable();
 
-    if (nit === "") {
-        mensaje.removeClass().addClass("alert alert-warning").text("⚠️ Ingresa un NIT antes de buscar.").show();
-        return;
-    }
-
-    badge.removeClass().addClass("badge bg-info text-dark").text("Buscando...").show();
-
-    $.ajax({
-        url: "../buscarCliente.jsp", // asegúrate de tener este JSP en /Sistema/buscarCliente.jsp
-        method: "GET",
-        data: { nit: nit },
-        success: function(data) {
-            data = data.trim();
-            if (data !== "" && !data.startsWith("ERROR")) {
-                const partes = data.split("|");
-                $("#nombres").val(partes[0]).prop("readonly", true);
-                $("#apellidos").val(partes[1]).prop("readonly", true);
-                $("#direccion").val(partes[2]).prop("readonly", true);
-                $("#telefono").val(partes[3]).prop("readonly", true);
-                badge.removeClass().addClass("badge bg-success").text("Cliente encontrado ✅");
-                mensaje.removeClass().addClass("alert alert-success").text("✅ Cliente encontrado.").show();
+    // Buscar cliente
+    $('#btnBuscarCliente').click(async () => {
+        const nit = $('#nit').val().trim();
+        if (!nit) { alert('Ingrese un NIT.'); return; }
+        const resp = await fetch(`ajax/buscarCliente.jsp?nit=${nit}`);
+        const data = await resp.text();
+        if (data && data !== "") {
+            const [nombres, apellidos, direccion, telefono] = data.split("|");
+            if (nombres) {
+                $('#nombres').val(nombres);
+                $('#apellidos').val(apellidos);
+                $('#direccion').val(direccion);
+                $('#telefono').val(telefono);
+                $('<input>').attr({type:'hidden',name:'id_cliente',value:1}).appendTo('form'); // puedes cambiar para buscar por id_cliente real
             } else {
-                $("#nombres, #apellidos, #direccion, #telefono").val("").prop("readonly", false);
-                badge.removeClass().addClass("badge bg-warning text-dark").text("Nuevo cliente ⚠️");
-                mensaje.removeClass().addClass("alert alert-warning").text("⚠️ Cliente no encontrado, ingresa los datos.").show();
+                alert('Cliente no encontrado.');
             }
-        },
-        error: function() {
-            badge.removeClass().addClass("badge bg-danger").text("Error ❌");
-            mensaje.removeClass().addClass("alert alert-danger").text("❌ Error al conectar con buscarCliente.jsp").show();
+        } else {
+            alert('Cliente no encontrado.');
         }
     });
-});
 
-// ✅ Calcular precios/subtotales
-function setPrecioYSubtotal($row) {
-    const $sel = $row.find('.producto');
-    const precio = parseFloat($sel.find(':selected').data('precio')) || 0;
-    const cant = parseInt($row.find('.cantidad').val()) || 0;
-    const sub = precio * cant;
-    $row.find('.precio').val(precio.toFixed(2));
-    $row.find('.subtotal').val(sub.toFixed(2));
-}
+    // Cargar opciones de productos
+    const opcionesProductos = `
+        <% try (Connection con = new ConexionDB().getConexion();
+               PreparedStatement ps = con.prepareStatement("SELECT id_producto, producto, precio_venta FROM productos ORDER BY producto");
+               ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) { %>
+                <option value="<%=rs.getInt("id_producto")%>" data-precio="<%=rs.getDouble("precio_venta")%>">
+                    <%=rs.getString("producto")%> (Q<%=rs.getDouble("precio_venta")%>)
+                </option>
+        <% } } catch (Exception e) { %><option>Error</option><% } %>`;
 
-function recalcular() {
-    let total = 0;
-    $("#tablaProductos tbody tr").each(function() {
-        const $row = $(this);
-        setPrecioYSubtotal($row);
-        total += parseFloat($row.find(".subtotal").val()) || 0;
+    // Agregar fila producto
+    $('#btnAddRow').click(() => {
+        $('#detalleVenta').append(`
+            <tr>
+                <td><select name="id_producto[]" class="form-select">${opcionesProductos}</select></td>
+                <td><input type="number" name="cantidad[]" value="1" class="form-control text-end" min="1"></td>
+                <td><input type="number" name="precio[]" class="form-control text-end" step="0.01" readonly></td>
+                <td class="subtotal text-end">0.00</td>
+                <td><button type="button" class="btn btn-danger btn-sm btnDelRow">X</button></td>
+            </tr>`);
     });
-    $("#total").val(total.toFixed(2));
-}
 
-$(document).on('change', '.producto', function() {
-    setPrecioYSubtotal($(this).closest('tr'));
-    recalcular();
-});
-
-$(document).on('input', '.cantidad', function() {
-    setPrecioYSubtotal($(this).closest('tr'));
-    recalcular();
-});
-
-$("#agregar").click(function() {
-    let $row = $("#tablaProductos tbody tr:first").clone();
-    $row.find('input').val('');
-    $row.find('select').prop('selectedIndex', 0);
-    $row.find('.cantidad').val('1');
-    setPrecioYSubtotal($row);
-    $("#tablaProductos tbody").append($row);
-    recalcular();
-});
-function verDetalle(idVenta) {
-    $.ajax({
-        url: "../views/detalleVenta.jsp",
-        type: "GET",
-        data: { id_venta: idVenta },
-        success: function(resp) {
-            $("#detalleVenta").html(resp);
-            new bootstrap.Modal('#modalDetalle').show();
-        },
-        error: function() {
-            alert('Error al cargar detalle');
-        }
+    // Eliminar fila
+    $(document).on('click', '.btnDelRow', function() {
+        $(this).closest('tr').remove(); recalcularTotal();
     });
-}
 
+    // Calcular subtotal
+    $(document).on('change input', '[name="id_producto[]"], [name="cantidad[]"]', function() {
+        const fila = $(this).closest('tr');
+        const precio = parseFloat(fila.find('select option:selected').data('precio')) || 0;
+        const cantidad = parseInt(fila.find('[name="cantidad[]"]').val()) || 0;
+        const subtotal = precio * cantidad;
+        fila.find('[name="precio[]"]').val(precio.toFixed(2));
+        fila.find('.subtotal').text(subtotal.toFixed(2));
+        recalcularTotal();
+    });
 
+    // Calcular total
+    function recalcularTotal() {
+        let total = 0;
+        $('#detalleVenta .subtotal').each(function() {
+            total += parseFloat($(this).text()) || 0;
+        });
+        $('#total').val(total.toFixed(2));
+    }
+});
 </script>
 
 </body>

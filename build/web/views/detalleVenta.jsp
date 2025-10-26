@@ -1,3 +1,4 @@
+<%@ include file="../WEB-INF/jwtFilter.jsp" %>
 <%@ page import="java.sql.*, utils.ConexionDB" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>

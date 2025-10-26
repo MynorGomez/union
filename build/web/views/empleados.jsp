@@ -1,3 +1,4 @@
+<%@ include file="../WEB-INF/jwtFilter.jsp" %>
 <%@ include file="../includes/menu.jsp" %>
 <%@ page import="modelo.Puesto,modelo.Empleado,java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

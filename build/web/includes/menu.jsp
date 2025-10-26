@@ -110,7 +110,7 @@
     </a>
 
     <hr class="text-secondary">
-    <a href="<%= context %>/views/login.jsp" class="text-danger">
+    <a href="<%= context %>/sr_logout" class="text-danger">
         <i class="bi bi-box-arrow-right"></i> Cerrar sesión
     </a>
 </div>

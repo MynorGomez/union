@@ -70,7 +70,7 @@
 </style>
 
 <div class="sidebar">
-    <h4><i class="bi bi-shop"></i> Mi Empresa</h4>
+    
 
     <a href="<%= context %>/index.jsp" class="<%= currentPage.contains("index.jsp") ? "active" : "" %>">
         <i class="bi bi-house-door"></i> Inicio
@@ -101,7 +101,7 @@
     </a>
 
     <!-- ✅ Aquí corregido: llama al servlet sr_venta -->
-    <a href="<%= context %>/sr_venta" class="<%= currentPage.contains("sr_venta") ? "active" : "" %>">
+    <a href="<%= context %>/views/ventas.jsp" class="<%= currentPage.contains("ventas.jsp") ? "active" : "" %>">
         <i class="bi bi-cash-stack"></i> Ventas
     </a>
 

@@ -79,7 +79,7 @@
                         <i class="bi bi-cash-stack display-5 text-warning"></i>
                         <h5 class="mt-2">Ventas</h5>
                         <h3><%= totalVentas %></h3>
-                        <a href="/sr_venta" class="btn btn-outline-warning btn-sm mt-2">Ver más</a>
+                        <a href="views/ventas.jsp" class="btn btn-outline-warning btn-sm mt-2">Ver más</a>
                     </div>
                 </div>
             </div>
@@ -97,11 +97,7 @@
             </div>
         </div>
 
-        <!-- 📈 Gráfica placeholder -->
-        <div class="mt-5 p-4 bg-white shadow-sm rounded">
-            <h5><i class="bi bi-graph-up"></i> Estadísticas de Ventas</h5>
-            <p class="text-muted mb-0">Aquí podrás agregar más adelante gráficos con Chart.js o Google Charts.</p>
-        </div>
+       
 
     </div>
 </div>

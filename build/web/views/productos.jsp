@@ -24,6 +24,11 @@
 </head>
 
 <body>
+<%
+    // 🔹 Contexto del proyecto (por ejemplo /Sistema)
+    String path = request.getContextPath();
+%>
+
 <div class="main-content">
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -66,7 +71,7 @@
                             <td><%= prod.getId_producto() %></td>
                             <td>
                                 <% if (prod.getImagen_url() != null && !prod.getImagen_url().isEmpty()) { %>
-                                    <img src="<%= prod.getImagen_url() %>" class="product-img" alt="<%= prod.getProducto() %>">
+                                    <img src="<%= path + "/" + prod.getImagen_url() %>" class="product-img" alt="<%= prod.getProducto() %>">
                                 <% } else { %>
                                     <span class="text-muted">Sin imagen</span>
                                 <% } %>
@@ -90,7 +95,8 @@
 <div class="modal fade" id="modalProducto" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <form action="../sr_producto" method="post" id="formProducto">
+            <!-- enctype agregado -->
+            <form action="../sr_producto" method="post" id="formProducto" enctype="multipart/form-data">
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title" id="tituloModal"><i class="bi bi-box-seam"></i> Nuevo Producto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -98,6 +104,7 @@
 
                 <div class="modal-body">
                     <input type="hidden" name="id_producto" id="id_producto">
+                    <input type="hidden" name="txt_imagen_actual" id="txt_imagen_actual">
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -122,8 +129,8 @@
                             <textarea name="txt_descripcion" id="txt_descripcion" class="form-control" rows="3"></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">URL de la Imagen</label>
-                            <input type="url" name="txt_imagen" id="txt_imagen" class="form-control">
+                            <label class="form-label">Imagen del Producto</label>
+                            <input type="file" name="file_imagen" id="file_imagen" class="form-control" accept="image/*">
                             <img id="imgPreview" class="product-img-preview d-none">
                         </div>
                         <div class="col-md-2">
@@ -162,6 +169,7 @@ function nuevoProducto(){
     $("#tituloModal").text("Nuevo Producto");
     $("#formProducto")[0].reset();
     $("#id_producto").val("");
+    $("#txt_imagen_actual").val("");
     $("#imgPreview").addClass("d-none");
     $("#btnGuardar").removeClass("d-none");
     $("#btnActualizar, #btnEliminar").addClass("d-none");
@@ -175,25 +183,32 @@ function editarProducto(fila){
     $("#txt_producto").val(fila.dataset.producto);
     $("#drop_marca").val(fila.dataset.marca);
     $("#txt_descripcion").val(fila.dataset.descripcion);
-    $("#txt_imagen").val(fila.dataset.imagen);
+    $("#txt_imagen_actual").val(fila.dataset.imagen);
     $("#txt_costo").val(fila.dataset.costo);
     $("#txt_venta").val(fila.dataset.venta);
     $("#txt_existencia").val(fila.dataset.existencia);
 
-    // Vista previa de imagen
+    // Vista previa de imagen con contextPath
     const imgUrl = fila.dataset.imagen;
-    if(imgUrl) $("#imgPreview").attr("src", imgUrl).removeClass("d-none");
+    if(imgUrl)
+        $("#imgPreview").attr("src", "<%= path %>/" + imgUrl).removeClass("d-none");
+    else
+        $("#imgPreview").addClass("d-none");
 
     $("#btnGuardar").addClass("d-none");
     $("#btnActualizar, #btnEliminar").removeClass("d-none");
     modalProducto.show();
 }
 
-// 🖼️ Vista previa al escribir URL
-$("#txt_imagen").on("input", function(){
-    const url = $(this).val();
-    if(url){
-        $("#imgPreview").attr("src", url).removeClass("d-none");
+// 🖼️ Vista previa de imagen subida
+$("#file_imagen").on("change", function(){
+    const file = this.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            $("#imgPreview").attr("src", e.target.result).removeClass("d-none");
+        }
+        reader.readAsDataURL(file);
     } else {
         $("#imgPreview").addClass("d-none");
     }

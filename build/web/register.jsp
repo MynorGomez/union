@@ -3,42 +3,43 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Sistema</title>
+  <title>Crear Cuenta - Sistema</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: url("assets/img/login/ga.jpg") no-repeat center center fixed;
+      background: url("assets/img/login/a.jpg") no-repeat center center fixed;
       background-size: cover;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
       margin: 0;
-      overflow: hidden;
     }
 
     body::before {
       content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(0,0,0,0.55);
       z-index: 0;
     }
 
-    .login-card {
+    .register-card {
       position: relative;
       z-index: 1;
-      width: 340px;
+      width: 100%;
+      max-width: 400px;
       background: rgba(255, 255, 255, 0.92);
       border-radius: 20px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      padding: 2rem;
+      padding: 2rem 1.5rem;
       text-align: center;
       backdrop-filter: blur(8px);
       animation: fadeIn 1s ease;
+      margin: 1rem;
     }
 
     @keyframes fadeIn {
@@ -47,8 +48,9 @@
     }
 
     .rocket {
-      width: 100px;
-      margin-bottom: 15px;
+      width: 90px;
+      max-width: 25%;
+      margin-bottom: 1rem;
       animation: float 3s ease-in-out infinite;
       filter: drop-shadow(0 0 10px #00f2fe);
       transition: transform 1s ease-in-out;
@@ -56,7 +58,7 @@
 
     @keyframes float {
       0% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+      50% { transform: translateY(-10px); }
       100% { transform: translateY(0); }
     }
 
@@ -69,12 +71,6 @@
       30% { transform: translateY(-40px) scale(1.1); }
       60% { transform: translateY(-200px) scale(0.9); opacity: 0.9; }
       100% { transform: translateY(-600px) scale(0.6); opacity: 0; }
-    }
-
-    h3 {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 1.5rem;
     }
 
     .form-control {
@@ -90,7 +86,7 @@
       box-shadow: 0 0 8px rgba(82,113,255,0.3);
     }
 
-    .btn-login {
+    .btn-register {
       width: 100%;
       border-radius: 25px;
       background-color: #5271ff;
@@ -101,27 +97,19 @@
       transition: 0.3s ease;
     }
 
-    .btn-login:hover {
+    .btn-register:hover {
       background-color: #4158d0;
       transform: scale(1.03);
     }
 
-    /* 🔹 Botón de crear cuenta */
-    .btn-create {
-      width: 100%;
-      border-radius: 25px;
-      background-color: transparent;
+    a {
       color: #5271ff;
-      border: 2px solid #5271ff;
-      padding: 10px;
-      font-weight: 600;
-      transition: 0.3s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
     }
 
-    .btn-create:hover {
-      background-color: #5271ff;
-      color: #fff;
-      transform: scale(1.03);
+    a:hover {
+      text-decoration: underline;
     }
 
     #msg {
@@ -129,62 +117,77 @@
       font-size: 0.9rem;
       margin-top: 10px;
     }
+
+    /* 📱 Responsive ajustes pequeños */
+    @media (max-width: 480px) {
+      .register-card {
+        padding: 1.5rem 1rem;
+      }
+      .rocket {
+        width: 70px;
+      }
+      h3 {
+        font-size: 1.2rem;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="login-card">
-    <!-- 🚀 Cohete -->
+  <div class="register-card">
     <img src="assets/img/login/cohete.png" alt="Rocket" class="rocket" id="rocket">
-
-    <h3>Iniciar Sesión</h3>
+    <h3>Crear Cuenta</h3>
     <div id="msg"></div>
 
-    <form id="loginForm">
+    <form id="registerForm">
+      <input type="text" name="nombre" class="form-control" placeholder="Nombre completo" required>
       <input type="text" name="usuario" class="form-control" placeholder="Usuario" required>
+      <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required>
       <input type="password" name="clave" class="form-control" placeholder="Contraseña" required>
-      <button type="submit" class="btn-login">Entrar</button>
+      <select name="rol" class="form-control" required>
+        <option value="">Selecciona un rol...</option>
+        <option value="admin">Administrador</option>
+        <option value="empleado" selected>Empleado</option>
+        <option value="invitado">Invitado</option>
+      </select>
+      <button type="submit" class="btn-register mt-3">Registrar</button>
     </form>
 
-    <!-- 🔹 Botón Crear Cuenta -->
     <div class="mt-3">
-      <button type="button" class="btn-create" onclick="window.location='register.jsp'">
-        Crear Cuenta
-      </button>
+      <a href="login.jsp">¿Ya tienes cuenta? Inicia sesión</a>
     </div>
   </div>
 
   <script>
-  $("#loginForm").submit(async function(e){
+  $("#registerForm").submit(async function(e){
     e.preventDefault();
     const rocket = document.getElementById("rocket");
-    $("#msg").html("<div class='text-muted'>Verificando credenciales...</div>");
+    $("#msg").html("<div class='text-muted'>Creando cuenta...</div>");
     
     const data = {
+      nombre: $("[name='nombre']").val(),
       usuario: $("[name='usuario']").val(),
-      clave: $("[name='clave']").val()
+      email: $("[name='email']").val(),
+      clave: $("[name='clave']").val(),
+      rol: $("[name='rol']").val()
     };
 
     try {
-      const res = await fetch("http://localhost:5119/api/auth/login", {
+      const res = await fetch("http://localhost:5119/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error("Error de autenticación");
+      if (!res.ok) throw new Error("Error de registro");
 
       const json = await res.json();
-      if (json.token) {
+      if (json.success || json.message) {
         rocket.classList.add("launch");
-        $("#msg").html("<div class='text-success mt-2'>Acceso concedido 🚀</div>");
-        setTimeout(() => {
-          $.post("sr_login", { token: json.token, usuario: data.usuario }, function(){
-            window.location = "index.jsp";
-          });
-        }, 1000);
+        $("#msg").html("<div class='text-success mt-2'>Cuenta creada correctamente 🚀</div>");
+        setTimeout(() => { window.location = "login.jsp"; }, 1500);
       } else {
-        $("#msg").html("<div class='alert alert-danger mt-3 text-center'>Credenciales incorrectas</div>");
+        $("#msg").html("<div class='alert alert-danger mt-3 text-center'>No se pudo crear la cuenta</div>");
       }
     } catch (error) {
       $("#msg").html("<div class='alert alert-danger mt-3 text-center'>Error al conectar con el servidor</div>");

@@ -1,26 +1,21 @@
 package modelo;
 
-import java.sql.*;
-import utils.ConexionDB;
-
 public class VentaDetalle {
-    private int id_detalle, id_venta, id_producto, cantidad;
-    private double precio_unitario, subtotal;
+    private int idVentaDetalle;
+    private int idVenta;
+    private int idProducto;
+    private int cantidad;
+    private double precioUnitario;
 
-    public void setId_venta(int id) { this.id_venta = id; }
-    public void setId_producto(int id) { this.id_producto = id; }
-    public void setCantidad(int c) { this.cantidad = c; this.subtotal = c * precio_unitario; }
-    public void setPrecio_unitario(double p) { this.precio_unitario = p; this.subtotal = cantidad * p; }
-
-    public boolean agregar(Connection con) throws SQLException {
-        String q = "INSERT INTO ventas_detalle (id_venta,id_producto,cantidad,precio_unitario,subtotal) VALUES (?,?,?,?,?)";
-        try (PreparedStatement ps = con.prepareStatement(q)) {
-            ps.setInt(1, id_venta);
-            ps.setInt(2, id_producto);
-            ps.setInt(3, cantidad);
-            ps.setDouble(4, precio_unitario);
-            ps.setDouble(5, subtotal);
-            return ps.executeUpdate() > 0;
-        }
-    }
+    // Getters y Setters
+    public int getIdVentaDetalle() { return idVentaDetalle; }
+    public void setIdVentaDetalle(int idVentaDetalle) { this.idVentaDetalle = idVentaDetalle; }
+    public int getIdVenta() { return idVenta; }
+    public void setIdVenta(int idVenta) { this.idVenta = idVenta; }
+    public int getIdProducto() { return idProducto; }
+    public void setIdProducto(int idProducto) { this.idProducto = idProducto; }
+    public int getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    public double getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(double precioUnitario) { this.precioUnitario = precioUnitario; }
 }

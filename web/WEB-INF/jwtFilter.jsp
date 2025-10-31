@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -20,5 +21,12 @@
         Object nombreObj = session.getAttribute("nombre");
         String nombreLog = (nombreObj != null) ? nombreObj.toString() : "Invitado";
         request.setAttribute("nombreLog", nombreLog);
+=======
+<%
+    HttpSession sesion = request.getSession(false);
+    if (sesion == null || sesion.getAttribute("jwt") == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+>>>>>>> fusion
     }
 %>

@@ -4,14 +4,18 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+<<<<<<< HEAD
 import java.sql.*;
 import utils.ConexionDB; // ✅ Usa tu clase de conexión existente
+=======
+>>>>>>> fusion
 
 @WebServlet(name = "sr_login", urlPatterns = {"/sr_login"})
 public class sr_login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+<<<<<<< HEAD
 
         String token = request.getParameter("token");
         String usuario = request.getParameter("usuario");
@@ -44,6 +48,15 @@ public class sr_login extends HttpServlet {
         sesion.setAttribute("nombre", nombreCompleto != null ? nombreCompleto : usuario);
 
         // 🔁 Responder OK al cliente
+=======
+        String token = request.getParameter("token");
+        String usuario = request.getParameter("usuario");
+
+        HttpSession sesion = request.getSession();
+        sesion.setAttribute("jwt", token);
+        sesion.setAttribute("usuario", usuario);
+
+>>>>>>> fusion
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

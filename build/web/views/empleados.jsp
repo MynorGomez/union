@@ -9,7 +9,10 @@
     <meta charset="UTF-8">
     <title>Mantenimiento de Empleados</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+=======
+>>>>>>> fusion
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body { background-color: #f8f9fa; }
@@ -33,15 +36,22 @@
                 <table class="table table-hover table-striped align-middle text-center" id="tablaEmpleados">
                     <thead class="table-dark">
                         <tr>
+<<<<<<< HEAD
+=======
+                            <th>ID</th>
+>>>>>>> fusion
                             <th>Código</th>
                             <th>Nombres</th>
                             <th>Apellidos</th>
                             <th>Dirección</th>
                             <th>Teléfono</th>
                             <th>Fecha Nac.</th>
+<<<<<<< HEAD
                             <th>Género</th>
                             <th>Inicio Labores</th>
                             <th>Registro</th>
+=======
+>>>>>>> fusion
                             <th>Puesto</th>
                         </tr>
                     </thead>
@@ -59,19 +69,27 @@
                             data-direccion="<%= emp.getDireccion() %>"
                             data-telefono="<%= emp.getTelefono() %>"
                             data-fn="<%= emp.getFecha_nacimiento() %>"
+<<<<<<< HEAD
                             data-genero="<%= emp.getGenero() %>"
                             data-fecha_inicio="<%= emp.getFecha_inicio_labores() %>"
                             data-fechaingreso="<%= emp.getFechaingreso() %>"
                             data-puesto="<%= emp.getId_puesto() %>">
+=======
+                            data-puesto="<%= emp.getId_puesto() %>">
+                            <td><%= emp.getId_empleado() %></td>
+>>>>>>> fusion
                             <td><%= emp.getCodigo() %></td>
                             <td><%= emp.getNombres() %></td>
                             <td><%= emp.getApellidos() %></td>
                             <td><%= emp.getDireccion() %></td>
                             <td><%= emp.getTelefono() %></td>
                             <td><%= emp.getFecha_nacimiento() %></td>
+<<<<<<< HEAD
                             <td><%= emp.getGenero() ? "Femenino" : "Masculino" %></td>
                             <td><%= emp.getFecha_inicio_labores() %></td>
                             <td><%= emp.getFechaingreso() %></td>
+=======
+>>>>>>> fusion
                             <td><%= emp.getPuesto() %></td>
                         </tr>
                         <% } %>
@@ -82,7 +100,11 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 <!-- 🧾 MODAL EMPLEADO -->
+=======
+<!-- 🧾 MODAL -->
+>>>>>>> fusion
 <div class="modal fade" id="modalEmpleado" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -96,6 +118,7 @@
                     <input type="hidden" name="id_empleado" id="id_empleado">
 
                     <div class="row g-3">
+<<<<<<< HEAD
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Código</label>
                             <input type="text" name="txt_codigo" id="txt_codigo" class="form-control" placeholder="Código" required>
@@ -146,6 +169,15 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Puesto</label>
+=======
+                        <div class="col-md-4"><input type="text" name="txt_codigo" id="txt_codigo" class="form-control" placeholder="Código" required></div>
+                        <div class="col-md-4"><input type="text" name="txt_nombres" id="txt_nombres" class="form-control" placeholder="Nombres" required></div>
+                        <div class="col-md-4"><input type="text" name="txt_apellidos" id="txt_apellidos" class="form-control" placeholder="Apellidos" required></div>
+                        <div class="col-md-6"><input type="text" name="txt_direccion" id="txt_direccion" class="form-control" placeholder="Dirección" required></div>
+                        <div class="col-md-3"><input type="text" name="txt_telefono" id="txt_telefono" class="form-control" placeholder="Teléfono" required></div>
+                        <div class="col-md-3"><input type="date" name="txt_fn" id="txt_fn" class="form-control" required></div>
+                        <div class="col-md-6">
+>>>>>>> fusion
                             <select name="drop_puesto" id="drop_puesto" class="form-select" required>
                                 <option value="">Seleccione un puesto</option>
                                 <%
@@ -175,13 +207,18 @@
 <script>
 const modalEmpleado = new bootstrap.Modal(document.getElementById('modalEmpleado'));
 
+<<<<<<< HEAD
 // 🟢 Nuevo empleado
+=======
+// Nuevo
+>>>>>>> fusion
 function nuevoEmpleado(){
     $("#tituloModal").text("Nuevo Empleado");
     $("#formEmpleado")[0].reset();
     $("#id_empleado").val("");
     $("#btnGuardar").removeClass("d-none");
     $("#btnActualizar, #btnEliminar").addClass("d-none");
+<<<<<<< HEAD
 
     // Mostrar fecha actual (solo visual)
     const now = new Date();
@@ -192,6 +229,12 @@ function nuevoEmpleado(){
 }
 
 // 🟡 Editar empleado
+=======
+    modalEmpleado.show();
+}
+
+// Editar
+>>>>>>> fusion
 function editarEmpleado(fila){
     $("#tituloModal").text("Editar Empleado");
     $("#id_empleado").val(fila.dataset.id);
@@ -201,6 +244,7 @@ function editarEmpleado(fila){
     $("#txt_direccion").val(fila.dataset.direccion);
     $("#txt_telefono").val(fila.dataset.telefono);
     $("#txt_fn").val(fila.dataset.fn);
+<<<<<<< HEAD
     $("#txt_genero").val(fila.dataset.genero);
     $("#txt_fecha_inicio_labores").val(fila.dataset.fecha_inicio);
     if (fila.dataset.fechaingreso) {
@@ -209,6 +253,8 @@ function editarEmpleado(fila){
         $("#txt_fechaingreso").val('');
     }
     $("#txt_fechaingreso").prop("disabled", true);
+=======
+>>>>>>> fusion
     $("#drop_puesto").val(fila.dataset.puesto);
     $("#btnGuardar").addClass("d-none");
     $("#btnActualizar, #btnEliminar").removeClass("d-none");

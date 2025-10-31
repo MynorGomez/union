@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+=======
+    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+>>>>>>> fusion
 <%@ include file="../WEB-INF/jwtFilter.jsp" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="utils.ConexionDB" %>

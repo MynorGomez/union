@@ -1,5 +1,9 @@
 <%@ include file="../WEB-INF/jwtFilter.jsp" %>
+<<<<<<< HEAD
 <%@ page import="java.sql.*, java.text.SimpleDateFormat, utils.ConexionDB" %>
+=======
+<%@ page import="java.sql.*, utils.ConexionDB" %>
+>>>>>>> fusion
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,6 +36,7 @@
     </style>
 </head>
 
+<<<<<<< HEAD
 <body>
 <div class="card border-0">
     <div class="card-body">
@@ -146,6 +151,96 @@
                 con.close();
             }
         %>
+=======
+<body>  <!-- 🔹 respeta el diseño del menú -->
+    
+            <div class="card-body">
+                <%
+                    String idVenta = request.getParameter("id_venta");
+                    ConexionDB cn = new ConexionDB();
+                    Connection con = cn.getConexion();
+
+                    PreparedStatement ps = con.prepareStatement(
+                        "SELECT v.no_factura, v.serie, v.fecha_venta, v.total, " +
+                        "c.nombres AS cliente_nombre, c.apellidos AS cliente_apellido, c.nit, " +
+                        "e.nombres AS empleado_nombre, e.apellidos AS empleado_apellido " +
+                        "FROM ventas v " +
+                        "INNER JOIN clientes c ON v.id_cliente = c.id_cliente " +
+                        "INNER JOIN empleados e ON v.id_empleado = e.id_empleado " +
+                        "WHERE v.id_venta = ?"
+                    );
+                    ps.setInt(1, Integer.parseInt(idVenta));
+                    ResultSet rs = ps.executeQuery();
+
+                    if (rs.next()) {
+                %>
+
+                <!-- DATOS GENERALES DE LA VENTA -->
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <h6 class="text-primary mb-3"><i class="bi bi-info-circle"></i> Datos de la Venta</h6>
+                    <div class="row">
+                        <div class="col-md-3"><strong>No. Factura:</strong> <%= rs.getString("no_factura") %></div>
+                        <div class="col-md-3"><strong>Serie:</strong> <%= rs.getString("serie") %></div>
+                        <div class="col-md-3"><strong>Fecha:</strong> <%= rs.getTimestamp("fecha_venta") %></div>
+                        <div class="col-md-3"><strong>Total Venta:</strong> Q <%= String.format("%.2f", rs.getDouble("total")) %></div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-4"><strong>Cliente:</strong> <%= rs.getString("cliente_nombre") %> <%= rs.getString("cliente_apellido") %></div>
+                        <div class="col-md-4"><strong>NIT:</strong> <%= rs.getString("nit") %></div>
+                        <div class="col-md-4"><strong>Empleado:</strong> <%= rs.getString("empleado_nombre") %> <%= rs.getString("empleado_apellido") %></div>
+                    </div>
+                </div>
+
+                <% } rs.close(); %>
+
+                <!-- DETALLE DE PRODUCTOS -->
+                <h6 class="text-secondary mb-3"><i class="bi bi-box-seam"></i> Productos Vendidos</h6>
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario (Q)</th>
+                            <th>Subtotal (Q)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                            ps = con.prepareStatement(
+                                "SELECT p.producto, d.cantidad, d.precio_unitario, d.subtotal " +
+                                "FROM ventas_detalle d " +
+                                "INNER JOIN productos p ON d.id_producto = p.id_producto " +
+                                "WHERE d.id_venta = ?"
+                            );
+                            ps.setInt(1, Integer.parseInt(idVenta));
+                            rs = ps.executeQuery();
+
+                            double total = 0;
+                            while (rs.next()) {
+                                total += rs.getDouble("subtotal");
+                        %>
+                        <tr>
+                            <td><%= rs.getString("producto") %></td>
+                            <td class="text-center"><%= rs.getInt("cantidad") %></td>
+                            <td class="text-end">Q <%= String.format("%.2f", rs.getDouble("precio_unitario")) %></td>
+                            <td class="text-end">Q <%= String.format("%.2f", rs.getDouble("subtotal")) %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end">Total:</td>
+                            <td class="text-end">Q <%= String.format("%.2f", total) %></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <%
+                    con.close();
+                %>
+            </div>
+        </div>
+>>>>>>> fusion
     </div>
 </div>
 

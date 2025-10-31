@@ -8,7 +8,10 @@ import modelo.Empleado;
 
 @WebServlet(name = "sr_empleado", urlPatterns = {"/sr_empleado"})
 public class sr_empleado extends HttpServlet {
+<<<<<<< HEAD
 
+=======
+>>>>>>> fusion
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -17,6 +20,7 @@ public class sr_empleado extends HttpServlet {
         Empleado emp = new Empleado();
 
         try {
+<<<<<<< HEAD
             // ===============================
             // Cargar datos comunes
             // ===============================
@@ -49,10 +53,32 @@ public class sr_empleado extends HttpServlet {
             switch (btn) {
                 case "Agregar":
                     emp.agregar(); // fechaingreso se autollenará con NOW() si no se manda
+=======
+            switch (btn) {
+                case "Agregar":
+                    emp.setCodigo(request.getParameter("txt_codigo"));
+                    emp.setNombres(request.getParameter("txt_nombres"));
+                    emp.setApellidos(request.getParameter("txt_apellidos"));
+                    emp.setDireccion(request.getParameter("txt_direccion"));
+                    emp.setTelefono(request.getParameter("txt_telefono"));
+                    emp.setFecha_nacimiento(request.getParameter("txt_fn"));
+                    emp.setId_puesto(Integer.parseInt(request.getParameter("drop_puesto")));
+                    emp.agregar();
+>>>>>>> fusion
                     break;
 
                 case "Actualizar":
                     emp.setId_empleado(Integer.parseInt(request.getParameter("id_empleado")));
+<<<<<<< HEAD
+=======
+                    emp.setCodigo(request.getParameter("txt_codigo"));
+                    emp.setNombres(request.getParameter("txt_nombres"));
+                    emp.setApellidos(request.getParameter("txt_apellidos"));
+                    emp.setDireccion(request.getParameter("txt_direccion"));
+                    emp.setTelefono(request.getParameter("txt_telefono"));
+                    emp.setFecha_nacimiento(request.getParameter("txt_fn"));
+                    emp.setId_puesto(Integer.parseInt(request.getParameter("drop_puesto")));
+>>>>>>> fusion
                     emp.actualizar();
                     break;
 
@@ -61,7 +87,10 @@ public class sr_empleado extends HttpServlet {
                     emp.eliminar();
                     break;
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> fusion
         } catch (Exception e) {
             System.out.println("❌ Error en sr_empleado: " + e.getMessage());
         }

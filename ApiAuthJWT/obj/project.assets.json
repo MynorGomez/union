@@ -1518,11 +1518,17 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\J\\.nuget\\packages\\": {}
+=======
+    "C:\\Users\\alexh\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+>>>>>>> fusion
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\J\\Desktop\\PROGRAMACION 2\\Sistema\\ApiAuthJWT\\ApiAuthJWT.csproj",
       "projectName": "ApiAuthJWT",
       "projectPath": "C:\\Users\\J\\Desktop\\PROGRAMACION 2\\Sistema\\ApiAuthJWT\\ApiAuthJWT.csproj",
@@ -1531,6 +1537,20 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\J\\AppData\\Roaming\\NuGet\\NuGet.Config"
+=======
+      "projectUniqueName": "C:\\Users\\alexh\\Desktop\\Sistema1\\Sistema\\ApiAuthJWT\\ApiAuthJWT.csproj",
+      "projectName": "ApiAuthJWT",
+      "projectPath": "C:\\Users\\alexh\\Desktop\\Sistema1\\Sistema\\ApiAuthJWT\\ApiAuthJWT.csproj",
+      "packagesPath": "C:\\Users\\alexh\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\alexh\\Desktop\\Sistema1\\Sistema\\ApiAuthJWT\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\alexh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
+>>>>>>> fusion
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -1608,7 +1628,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+>>>>>>> fusion
       }
     }
   }

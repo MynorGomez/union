@@ -12,13 +12,24 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.json-20231013.jar}</file>
+<<<<<<< HEAD
+=======
+                    <path-in-war>WEB-INF/lib</path-in-war>
+>>>>>>> fusion
                 </library>
                 <library dirs="200">
                     <file>${file.reference.json-20210307.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
+<<<<<<< HEAD
                     <file>${file.reference.json-simple-1.1.1.jar}</file>
+=======
+                    <file>${&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD}</file>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.itextpdf-5.5.13.3.jar}</file>
+>>>>>>> fusion
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

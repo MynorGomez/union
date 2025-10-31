@@ -17,6 +17,7 @@ public class sr_cliente extends HttpServlet {
         Cliente cli = new Cliente();
 
         try {
+<<<<<<< HEAD
             // ===============================
             // Campos comunes
             // ===============================
@@ -45,10 +46,30 @@ public class sr_cliente extends HttpServlet {
             switch (btn) {
                 case "Agregar":
                     cli.agregar();  // fechaingreso se autollenará con NOW() en MySQL
+=======
+            switch (btn) {
+                case "Agregar":
+                    cli.setNit(request.getParameter("txt_nit"));
+                    cli.setNombres(request.getParameter("txt_nombres"));
+                    cli.setApellidos(request.getParameter("txt_apellidos"));
+                    cli.setDireccion(request.getParameter("txt_direccion"));
+                    cli.setTelefono(request.getParameter("txt_telefono"));
+                    cli.setFecha_nacimiento(request.getParameter("txt_fn"));
+                    cli.agregar();
+>>>>>>> fusion
                     break;
 
                 case "Actualizar":
                     cli.setId_cliente(Integer.parseInt(request.getParameter("id_cliente")));
+<<<<<<< HEAD
+=======
+                    cli.setNit(request.getParameter("txt_nit"));
+                    cli.setNombres(request.getParameter("txt_nombres"));
+                    cli.setApellidos(request.getParameter("txt_apellidos"));
+                    cli.setDireccion(request.getParameter("txt_direccion"));
+                    cli.setTelefono(request.getParameter("txt_telefono"));
+                    cli.setFecha_nacimiento(request.getParameter("txt_fn"));
+>>>>>>> fusion
                     cli.actualizar();
                     break;
 
@@ -57,12 +78,18 @@ public class sr_cliente extends HttpServlet {
                     cli.eliminar();
                     break;
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> fusion
         } catch (Exception e) {
             System.out.println("❌ Error en sr_cliente: " + e.getMessage());
         }
 
+<<<<<<< HEAD
         // Redirige siempre al JSP principal
+=======
+>>>>>>> fusion
         response.sendRedirect("views/clientes.jsp");
     }
 }
